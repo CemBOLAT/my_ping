@@ -1,0 +1,14 @@
+enc_des.o: enc_des.c ../config.h ../confpaths.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/paths.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/sys/paths.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/sys/appleapiopts.h
+
+../config.h:
+
+../confpaths.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/paths.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/sys/paths.h:
+
+/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/sys/appleapiopts.h:

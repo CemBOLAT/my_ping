@@ -6,7 +6,7 @@ typedef enum TokenType {
     TokenType_Verbose, // -v // ayrıntı ekle
     TokenType_Help, // -? // yardım
     TokenType_Flood, // -f // paketi hızlı gönder fakat daha az ayrıntı
-    TokenType_Preload, // -p // Önce belirli bir miktar veri gönder ve sonra gerçek veriyi gönder -l 10 ile 10 tane veri gönder
+    TokenType_Preload, // -l // Önce belirli bir miktar veri gönder ve sonra gerçek veriyi gönder -l 10 ile 10 tane veri gönder
     TokenType_Numeric, // -n // IP adreslerini sayısal olarak göster DNS çözümleme yapma
     TokenType_Deadline, // -w // Zaman aşımı süresi
     TokenType_Timeout, // -W // Zaman aşımı süresi
@@ -37,4 +37,5 @@ typedef enum TokenType {
 typedef struct Token {
     TokenType type;
     char* value; // -l 10 -> value = 10 for -v value = NULL
+    void *function; // -v -> function = verbose
 }Token;

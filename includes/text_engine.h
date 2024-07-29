@@ -15,16 +15,17 @@
 #define WHITE(str) printf("\033[1;37m%s\033[0m", str)
 #define RESET printf("\033[0m");
 
-void text_engine_test(){
-    RED("RED\n");
-    GREEN("GREEN\n");
-    YELLOW("YELLOW\n");
-    BLUE("BLUE\n");
-    MAGENTA("MAGENTA\n");
-    CYAN("CYAN\n");
-    WHITE("WHITE\n");
-    RESET;
-}
+// void text_engine_test(){
+//     RED("RED\n");
+//     GREEN("GREEN\n");
+//     YELLOW("YELLOW\n");
+//     BLUE("BLUE\n");
+//     MAGENTA("MAGENTA\n");
+//     CYAN("CYAN\n");
+//     WHITE("WHITE\n");
+//     RESET;
+// }
 
 
 #define ERROR_MESSAGE(str)  printf("\033[1;31mError: %s (File: %s, Line: %d)\n\033[0m", str, __FILE__, __LINE__);
+#define USAGE "Usage: ./ft_ping [-?] [-v] [-f] [-l] [-n] [-w] [-W] [-p] [-s] [-T] [-t] [--ip-timestamp] <hostname>\n"

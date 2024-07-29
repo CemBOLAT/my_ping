@@ -11,75 +11,39 @@ typedef struct TokenArray {
     int     capacity;
 } TokenArray;
 
-TokenArray* createArray(){
-    TokenArray* arr = (TokenArray*)malloc(sizeof(TokenArray));
-    if (arr){
-        ERROR_MESSAGE("Memory allocation failed");
-        exit(1);
-    }
-    arr->size = 0;
-    arr->capacity = INITIAL_CAPACITY;
-    arr->tokens = (Token*)malloc(sizeof(Token) * arr->capacity);
-    return arr;
-}
 
-void insertArray(TokenArray* arr, Token token){
-    if (!arr){
-        ERROR_MESSAGE("Array is NULL"); 
-        exit(1); // sonrasında benim free fonksiyonumla değiştirilecek
-    }
-    if (arr->size >= arr->capacity){
-        arr->capacity *= 2;
-        arr->tokens = (Token*)realloc(arr->tokens, sizeof(Token) * arr->capacity);
-    }
-    arr->tokens[arr->size++] = token;
-}
+typedef struct HostArray {
+    char    **host;
+    int     size;
+    int     capacity;
+} HostArray;
 
-void freeArray(TokenArray* arr){
-    if (!arr){
-        ERROR_MESSAGE("Array is NULL");
-        exit(1); // sonrasında benim free fonksiyonumla değiştirilecek
-    }
-    free(arr->tokens);
-    free(arr);
-}
+typedef struct Options {
+    char    *option;
+    int     value;
+} Options;
 
-void printArray(TokenArray* arr){
-    if (!arr){
-        ERROR_MESSAGE("Array is NULL");
-        exit(1); // sonrasında benim free fonksiyonumla değiştirilecek
-    }
-    for (int i = 0; i < arr->size; i++){
-        printf("Token Type: %d, Token Value: %s\n", arr->tokens[i].type, arr->tokens[i].value);
-    }
-}
+typedef struct s_ping {
+    TokenArray *arr;
+    int         mask;
+    HostArray   *hosts;
+    Options     options[12];
+} ft_ping;
 
-void removeArrayIndex(TokenArray* arr, int index){
-    if (!arr){
-        ERROR_MESSAGE("Array is NULL");
-        exit(1); // sonrasında benim free fonksiyonumla değiştirilecek
-    }
-    if (index < 0 || index >= arr->size){
-        ERROR_MESSAGE("Index out of bounds");
-        exit(1); // sonrasında benim free fonksiyonumla değiştirilecek
-    }
-    for (int i = index; i < arr->size - 1; i++){
-        arr->tokens[i] = arr->tokens[i + 1];
-    }
-    arr->size--;
-}
+TokenArray* createArray();
+void insertArray(TokenArray* arr, Token token);
+void freeArray(TokenArray* arr);
+void printArray(TokenArray* arr);
+void removeArrayIndex(TokenArray* arr, int index);
+void removeArrayValue(TokenArray* arr, Token token);
+int parse_options(int argc, char **argv, ft_ping *ping);
 
-void removeArrayValue(TokenArray* arr, Token token){
-    if (!arr){
-        ERROR_MESSAGE("Array is NULL");
-        exit(1); // sonrasında benim free fonksiyonumla değiştirilecek
-    }
-    for (int i = 0; i < arr->size; i++){
-        if (arr->tokens[i].type == token.type && arr->tokens[i].value == token.value){
-            removeArrayIndex(arr, i);
-            return;
-        }
-    }
-    ERROR_MESSAGE("Token not found");
-    exit(1); // sonrasında benim free fonksiyonumla değiştirilecek
-}
+
+HostArray *createStringArray();
+void insertStringArray(HostArray *arr, char *str);
+void freeStringArray(HostArray *arr);
+void printStringArray(HostArray *arr);
+void removeStringArrayIndex(HostArray **arr, int index);
+void removeStringArrayValue(HostArray *arr, char *str);
+
+void ft_perfect_exit(ft_ping *ping);
