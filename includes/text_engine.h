@@ -29,3 +29,19 @@
 
 #define ERROR_MESSAGE(str)  printf("\033[1;31mError: %s (File: %s, Line: %d)\n\033[0m", str, __FILE__, __LINE__);
 #define USAGE "Usage: ./ft_ping [-?] [-v] [-f] [-l] [-n] [-w] [-W] [-p] [-s] [-T] [-t] [--ip-timestamp] <hostname>\n"
+
+#define HELP "Usage:\n ft_ping [OPTION]... <hostname>\n\n\n" \
+"Options:\n" \
+"  -v            Verbose output\n" \
+"  -?            Help\n" \
+"  -f            Flood ping\n" \
+"  -l <size>     Send buffer size\n" \
+"  -n            Numeric output only\n" \
+"  -w <timeout>  Time to wait for a response\n" \
+"  -W <timeout>  Time to wait for a response\n" \
+"  -p <pattern>  Fill ICMP packet with pattern\n" \
+"  -s <size>     Send buffer size\n" \
+"  -T            Timestamp\n" \
+"  -t <ttl>      Set the IP Time to Live\n" \
+"  --ip-timestamp             Timestamp\n" \
+"\n\n"

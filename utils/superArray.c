@@ -1,4 +1,4 @@
-#include "../includes/superArray.h"
+#include "../includes/ping.h"
 #include <string.h>
 
 TokenArray* createArray(){

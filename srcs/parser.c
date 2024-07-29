@@ -1,6 +1,7 @@
-#include "../includes/superArray.h"
+#include "../includes/ping.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 void init_options(Options *options){
     char *op[12] = {"-v", "-?", "-f", "-l", "-n", "-w", "-W", "-p", "-s", "-T", "-t", "--ip-timestamp"};
@@ -17,10 +18,11 @@ int parse_options(int argc, char **argv, ft_ping *ping){
     init_options(ping->options);
     ping->arr = createArray();
     ping->hosts = createStringArray();
-
+    ping->socket = -1;
+    bool isOption = false;
     for (int i = 1; i < argc; i++)
     {
-
+        isOption = false;
         // Parameter input
         if (argv[i][0] == '-')
         {
@@ -28,11 +30,12 @@ int parse_options(int argc, char **argv, ft_ping *ping){
             {
                 if (strcmp(argv[i], ping->options[j].option) == 0)
                 {
+                    isOption = true;
                     Token token;
                     token.type = j;
                     if (ping->options[j].value == 1)
                     {
-                        if (i + 1 == argc)
+                        if (i + 1 == argc || !isNumber(argv[i + 1]))
                         {
                             ERROR_MESSAGE(USAGE);
                             ft_perfect_exit(ping);
@@ -51,6 +54,11 @@ int parse_options(int argc, char **argv, ft_ping *ping){
                     insertArray(ping->arr, token);
                     break;
                 }
+            }
+            if (!isOption)
+            {
+                ERROR_MESSAGE(argv[i]);
+                ft_perfect_exit(ping);
             }
         }
         else

@@ -2,7 +2,7 @@
 
 #include "text_engine.h"
 
-typedef enum TokenType {
+typedef enum s_TokenType {
     TokenType_Verbose, // -v // ayrıntı ekle
     TokenType_Help, // -? // yardım
     TokenType_Flood, // -f // paketi hızlı gönder fakat daha az ayrıntı
@@ -15,6 +15,7 @@ typedef enum TokenType {
     TokenType_TimeStamp, // -T // Zaman damgası ekle
     TokenType_TimeToLive, // -t // TTL değeri bu paketin kaç hop geçebileceğini belirler
     TokenType_Ip_TimeStamp, // --ip-timestamp // IP zaman damgası ekle  Bu, paketlerin ne zaman gönderildiği ve alındığı hakkında bilgi sağlar.
+    TokenType_None,
     /*
         Mixtape Usage of the ping commands parameters
         -v : Tüm parametreler ile beraber kullanılabilir.
@@ -33,6 +34,11 @@ typedef enum TokenType {
         --ip-timestamp	IP zaman damgası ekler.	                Almaz	                        0
     */
 }TokenType;
+
+// Setsockopt parameters.
+#define DEFAULT_DEADLINE 5
+#define DEFAULT_TIMEOUT 1
+#define DEFAULT_TIME_TO_LIVE 64
 
 typedef struct Token {
     TokenType type;

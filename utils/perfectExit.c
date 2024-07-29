@@ -1,6 +1,6 @@
-#include "../includes/superArray.h"
+#include "../includes/ping.h"
 #include <stdio.h>
-
+#include <unistd.h>
 void ft_perfect_exit(ft_ping *ping){
     if (!ping){
         ERROR_MESSAGE("ft_ping is NULL");
@@ -11,6 +11,9 @@ void ft_perfect_exit(ft_ping *ping){
     }
     if (ping->hosts){
         freeStringArray(ping->hosts);
+    }
+    if (ping->socket != -1){
+        close(ping->socket);
     }
     exit(0);
 }

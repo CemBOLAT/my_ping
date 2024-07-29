@@ -5,6 +5,9 @@ SRC := main.c \
 		./srcs/parser.c \
 		./utils/superArray.c \
 		./utils/perfectExit.c \
+		./srcs/ping.c \
+		./srcs/socket.c \
+		./utils/tokenize_utils.c \
 
 OBJ := $(SRC:.c=.o)
 
