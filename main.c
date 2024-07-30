@@ -1,9 +1,12 @@
 #include "./includes/ping.h"
 #include <stdio.h>
 
+
 int main(int argc, char **argv){
 
     ft_ping ping;
+
+    global = &ping;
 
     if (argc == 1){
         ERROR_MESSAGE("ping: missing host operand");

@@ -1,7 +1,8 @@
 #include "../includes/ping.h"
+#include <netinet/in.h>
+#include <netinet/ip.h>
 
 static void setsockopt_custom(ft_ping *ping, int level, int option, TokenType type, int default_value){
-    printf("setsockopt_custom\n");
     int tmp = get_option(ping->arr, type);
     int value = (tmp == TokenType_None) ? default_value : tmp;
     if (setsockopt(ping->socket, level, option, &value, sizeof(value)) < 0){
@@ -33,14 +34,17 @@ void init_socket(ft_ping *ping){
         ft_perfect_exit(ping);
     }
     // SEND TIMEOUT
-    //setsockopt_custom(ping, SOL_SOCKET, SO_SNDTIMEO, TokenType_Deadline, DEFAULT_DEADLINE);
 
     // --ip-timestamp option is used to add timestamp to the ip header
     if (get_option(ping->arr, TokenType_Ip_TimeStamp) != TokenType_None) {
         int option = 1;
-        if (setsockopt(ping->socket, IPPROTO_IP, ICMP_TIMESTAMP, &option, sizeof(option)) < 0) {
-            perror("setsockopt");
-            exit(EXIT_FAILURE);
-        }
+        // ICMP_TIMESTAMP is USED İN LINUX but not in MAC
+        // IP_TIMESTAMP is used in MAC
+        #ifdef __linux__
+            if (setsockopt(ping->socket, IPPROTO_IP, ICMP_TIMESTAMP, &option, sizeof(option)) < 0){
+                ERROR_MESSAGE("setsockopt");
+                ft_perfect_exit(ping);
+            }
+        #endif        
     }
 }

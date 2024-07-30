@@ -35,9 +35,14 @@ int parse_options(int argc, char **argv, ft_ping *ping){
                     token.type = j;
                     if (ping->options[j].value == 1)
                     {
-                        if (i + 1 == argc || !isNumber(argv[i + 1]))
+                        if (i + 1 == argc)
                         {
                             ERROR_MESSAGE(USAGE);
+                            ft_perfect_exit(ping);
+                        }
+                        if (token.type != TokenType_Pattern && !isNumber(argv[i + 1]))
+                        {
+                            ERROR_MESSAGE(argv[i + 1]);
                             ft_perfect_exit(ping);
                         }
                         token.value = argv[++i];

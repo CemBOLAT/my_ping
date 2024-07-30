@@ -40,6 +40,8 @@ typedef enum s_TokenType {
 #define DEFAULT_TIMEOUT 1
 #define DEFAULT_TIME_TO_LIVE 64
 
+#define DEFAULT_PACKET_SIZE 56
+
 typedef struct Token {
     TokenType type;
     char* value; // -l 10 -> value = 10 for -v value = NULL

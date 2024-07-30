@@ -14,7 +14,6 @@
 #include <netinet/ip_icmp.h>
 #include <netdb.h>
 
-
 typedef struct s_ping {
     TokenArray          *arr;
     int                 socket;
@@ -24,8 +23,11 @@ typedef struct s_ping {
     struct addrinfo      *info;
     struct sockaddr_in  dest_addr;
     struct icmp         icmp_hdr;
-    char                packet[sizeof(struct icmp)];
+    char                *packet;
+    int                 packet_size;
 } ft_ping;
+
+ft_ping *global;
 
 int         parse_options(int argc, char **argv, ft_ping *ping);
 
@@ -37,3 +39,5 @@ void        init_socket(ft_ping *ping);
 bool        have_option(TokenArray *arr, TokenType type);
 TokenType   get_option(TokenArray *arr, TokenType type);
 bool        isNumber(char *str);
+const char  *get_option_value(TokenArray *arr, TokenType type);
+void        signal_exit(int signum);

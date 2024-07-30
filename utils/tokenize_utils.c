@@ -23,6 +23,17 @@ TokenType get_option(TokenArray *arr, TokenType type){
     return TokenType_None;
 }
 
+const char *get_option_value(TokenArray *arr, TokenType type){
+    for (int i = 0; i < arr->size; i++)
+    {
+        if (arr->tokens[i].type == type)
+        {
+            return arr->tokens[i].value;
+        }
+    }
+    return NULL;
+}
+
 bool isNumber(char *str){
     for (int i = 0; str[i] != '\0'; i++)
     {
