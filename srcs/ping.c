@@ -7,7 +7,6 @@
 #include <netinet/ip_icmp.h>
 #include <errno.h>
 #include <netinet/ip.h> // iphdr tanımı için gerekli
-#include <netinet/ip_var.h> // iphdr tanımı için gerekli
 #include <netinet/in.h> // sockaddr_in tanımı için gerekli
 
 void send_icmp_packet(ft_ping *ping)

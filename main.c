@@ -1,7 +1,7 @@
 #include "./includes/ping.h"
 #include <stdio.h>
 
-
+ft_ping *global;
 int main(int argc, char **argv){
 
     ft_ping ping;

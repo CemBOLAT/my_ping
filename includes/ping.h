@@ -27,7 +27,7 @@ typedef struct s_ping {
     int                 packet_size;
 } ft_ping;
 
-ft_ping *global;
+extern ft_ping *global;
 
 int         parse_options(int argc, char **argv, ft_ping *ping);
 
