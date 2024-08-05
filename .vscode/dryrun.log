@@ -3,7 +3,6 @@ make: Entering directory `/Users/cembolat/Desktop/ft_ping'
 cc  -c main.c -o main.o
 cc  -c srcs/parser.c -o srcs/parser.o
 cc  -c utils/superArray.c -o utils/superArray.o
- 
 cc  -c utils/perfectExit.c -o utils/perfectExit.o
 cc  -c srcs/ping.c -o srcs/ping.o
 cc  -c srcs/socket.c -o srcs/socket.o
