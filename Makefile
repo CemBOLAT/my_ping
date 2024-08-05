@@ -15,7 +15,7 @@ OBJ := $(SRC:.c=.o)
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJ)
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) -g -ggdb -lm
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

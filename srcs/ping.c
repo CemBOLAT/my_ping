@@ -8,73 +8,8 @@
 #include <errno.h>
 #include <netinet/ip.h> // iphdr tanımı için gerekli
 #include <netinet/in.h> // sockaddr_in tanımı için gerekli
-
-void send_icmp_packet(ft_ping *ping)
-{
-    if (sendto(ping->socket, ping->packet, ping->packet_size, 0, (struct sockaddr *)&ping->dest_addr, sizeof(ping->dest_addr)) <= 0)
-    {
-        ERROR_MESSAGE("sendto");
-        ft_perfect_exit(ping);
-    }
-
-    printf("ICMP request sent to %s\n", ping->hosts->host[0]);
-}
-
-void receive_icmp_packet(ft_ping *ping)
-{
-    char buffer[1024];
-    struct sockaddr_in recv_addr;
-    socklen_t addr_len = sizeof(recv_addr);
-    int bytes_received = recvfrom(ping->socket, buffer, sizeof(buffer), 0, (struct sockaddr *)&recv_addr, &addr_len);
-    if (bytes_received < 0)
-    {
-        if (errno == EAGAIN || errno == EWOULDBLOCK)
-        {
-            RED("Request timed out.\n");
-            RESET;
-        }
-        else
-        {
-            ERROR_MESSAGE("recvfrom");
-            ft_perfect_exit(ping);
-        }
-    }
-    else
-    {
-        // Process ICMP reply
-        struct iphdr *ip_hdr = (struct iphdr *)buffer;
-        int ip_header_len = ip_hdr->ihl * 4;
-
-        struct icmphdr *icmp_hdr = (struct icmphdr *)(buffer + ip_header_len);
-        
-        if (icmp_hdr->type == ICMP_ECHOREPLY)
-        {
-            if (icmp_hdr->un.echo.id == getpid())
-            {
-                struct timeval *sent_time = (struct timeval *)(buffer + ip_header_len + sizeof(struct icmphdr));
-                struct timeval recv_time;
-                gettimeofday(&recv_time, NULL);
-                
-                long rtt = (recv_time.tv_sec - sent_time->tv_sec) * 1000.0 + (recv_time.tv_usec - sent_time->tv_usec) / 1000.0;
-
-                printf("ICMP reply from %s: seq=%u ttl=%d time=%ld ms\n",
-                       inet_ntoa(recv_addr.sin_addr),
-                       ntohs(icmp_hdr->un.echo.sequence),
-                       ip_hdr->ttl,
-                       rtt);
-            }
-            else
-            {
-                printf("Received ICMP packet with unmatched id: %d\n", icmp_hdr->un.echo.id);
-            }
-        }
-        else
-        {
-            printf("Received non-echo reply ICMP packet: type=%d, code=%d\n", icmp_hdr->type, icmp_hdr->code);
-        }
-    }
-}
-
+#include <limits.h>
+#include <math.h>
 
 void fill_pattern(char *packet, const char *pattern, size_t length)
 {
@@ -115,6 +50,130 @@ void add_timestamp(char *packet, size_t offset)
     gettimeofday(&tv, NULL);
     memcpy(packet + offset, &tv, sizeof(tv));
 }
+
+
+void packetCycle(ft_ping *ping){
+    // Clear packet memory
+    memset(ping->packet, 0, ping->packet_size);
+
+    // Initialize ICMP header
+
+    struct icmp *icmp_hdr = (struct icmp *)ping->packet;
+    icmp_hdr->icmp_type = ICMP_ECHO;
+    icmp_hdr->icmp_code = 0;
+    icmp_hdr->icmp_id = getpid();
+    icmp_hdr->icmp_seq = ping->seq++;
+    icmp_hdr->icmp_cksum = 0;
+
+    // Copy ICMP header to packet
+    memcpy(ping->packet, icmp_hdr, sizeof(struct icmp));
+
+    // Add pattern to packet if specified
+    const char *pattern = NULL;
+    if (have_option(ping->arr, TokenType_Pattern))
+    {
+        pattern = get_option_value(ping->arr, TokenType_Pattern);
+        fill_pattern(ping->packet + sizeof(struct icmp) + sizeof(struct timeval), pattern, ping->packet_size - sizeof(struct icmp) - sizeof(struct timeval));
+    }
+
+    // Add timestamp to packet
+    if (have_option(ping->arr, TokenType_TimeStamp))
+    {
+        add_timestamp(ping->packet, sizeof(struct icmp) + (pattern == NULL ? 0 : strlen(pattern)));
+    }
+
+    // Calculate checksum
+    icmp_hdr->icmp_cksum = checksum((uint16_t *)ping->packet, ping->packet_size);
+
+    // Copy ICMP header to packet
+
+    memcpy(ping->packet, icmp_hdr, sizeof(struct icmp));
+}
+
+void send_icmp_packet(ft_ping *ping)
+{
+    packetCycle(ping);
+    gettimeofday(&ping->round_trip.sendTime, NULL);
+    if (sendto(ping->socket, ping->packet, ping->packet_size, 0, (struct sockaddr *)&ping->dest_addr, sizeof(ping->dest_addr)) <= 0)
+    {
+        ERROR_MESSAGE("sendto");
+        // use errno to determine the cause of the error
+        //printf("errno: %d\n", errno);
+        ft_perfect_exit(ping);
+    }
+
+    //printf("ICMP request sent to %s\n", ping->hosts->host[0]);
+}
+
+void receive_icmp_packet(ft_ping *ping) {
+    char buffer[1024];
+    struct sockaddr_in recv_addr;
+    socklen_t addr_len = sizeof(recv_addr);
+    int bytes_received = recvfrom(ping->socket, buffer, sizeof(buffer), 0, (struct sockaddr *)&recv_addr, &addr_len);
+    
+    if (bytes_received < 0) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK) {
+            RED("Request timed out.\n");
+            RESET;
+        } else {
+            ERROR_MESSAGE("recvfrom");
+            ft_perfect_exit(ping);
+        }
+    } else {
+        struct iphdr *ip_hdr = (struct iphdr *)buffer;
+        int ip_header_len = ip_hdr->ihl * 4;
+        struct icmphdr *icmp_hdr = (struct icmphdr *)(buffer + ip_header_len);
+        
+        if (icmp_hdr->type == ICMP_ECHOREPLY && icmp_hdr->un.echo.id == getpid()) {
+            gettimeofday(&ping->round_trip.recvTime, NULL);
+
+            long rtt = (ping->round_trip.recvTime.tv_sec - ping->round_trip.sendTime.tv_sec) * 1000L +
+                       (ping->round_trip.recvTime.tv_usec - ping->round_trip.sendTime.tv_usec) / 1000L;
+
+            // Update min
+            if (rtt < (ping->round_trip.min.tv_sec * 1000L + ping->round_trip.min.tv_usec / 1000L) || ping->round_trip.count == 0) {
+                ping->round_trip.min.tv_sec = rtt / 1000L;
+                ping->round_trip.min.tv_usec = (rtt % 1000L) * 1000L;
+            }
+
+            // Update max
+            if (rtt > (ping->round_trip.max.tv_sec * 1000L + ping->round_trip.max.tv_usec / 1000L) || ping->round_trip.count == 0) {
+                ping->round_trip.max.tv_sec = rtt / 1000L;
+                ping->round_trip.max.tv_usec = (rtt % 1000L) * 1000L;
+            }
+
+            // Update sum for average and std deviation
+            ping->round_trip.sum_rtt += rtt;
+            ping->round_trip.sum_rtt_squared += rtt * rtt;
+            ping->round_trip.count++;
+
+            // Calculate average
+            long avg_rtt = ping->round_trip.sum_rtt / ping->round_trip.count;
+
+            // Calculate standard deviation
+            long avg_rtt_squared = ping->round_trip.sum_rtt_squared / ping->round_trip.count;
+            long std_dev = sqrt(avg_rtt_squared - avg_rtt * avg_rtt);
+
+            printf("%d bytes from %s: icmp_seq=%d ttl=%d time=%ld ms\n",
+                   bytes_received - ip_header_len,
+                   inet_ntoa(recv_addr.sin_addr),
+                   icmp_hdr->un.echo.sequence,
+                   ip_hdr->ttl,
+                   rtt);
+            // printf("Min RTT: %ld ms\n", ping->round_trip.min.tv_sec * 1000L + ping->round_trip.min.tv_usec / 1000L);
+            // printf("Max RTT: %ld ms\n", ping->round_trip.max.tv_sec * 1000L + ping->round_trip.max.tv_usec / 1000L);
+            // printf("Avg RTT: %ld ms\n", avg_rtt);
+            // printf("Std Dev: %ld ms\n", std_dev);
+        } else {
+            char output[1024];
+            sprintf(output, "Received ICMP packet with type %d", icmp_hdr->type);
+            ERROR_MESSAGE(output);
+            RESET;
+            bzero(output, sizeof(output));
+        }
+    }
+}
+
 void init_icmp_packet(ft_ping *ping)
 {
     // Parse packet size from options
@@ -133,36 +192,23 @@ void init_icmp_packet(ft_ping *ping)
         ft_perfect_exit(ping);
     }
 
-    // Clear packet memory
-    memset(ping->packet, 0, ping->packet_size);
+    packetCycle(ping);
+}
 
-    // Initialize ICMP header
-    ping->icmp_hdr.icmp_type = ICMP_ECHO;
-    ping->icmp_hdr.icmp_code = 0;
-    ping->icmp_hdr.icmp_id = getpid();
-    ping->icmp_hdr.icmp_seq = 0;
-    ping->icmp_hdr.icmp_cksum = 0;
+void init_dest_addr(ft_ping *ping)
+{
+    // Initialize destination address
+    ping->dest_addr.sin_family = AF_INET;
+    ping->dest_addr.sin_port = 0;
+    ping->dest_addr.sin_addr.s_addr = inet_addr(ping->hosts->host[0]);
+}
 
-    // Copy ICMP header to packet
-    memcpy(ping->packet, &ping->icmp_hdr, sizeof(ping->icmp_hdr));
-
-    // Add pattern to packet if specified
-    const char *pattern = NULL;
-    if (have_option(ping->arr, TokenType_Pattern))
-    {
-        pattern = get_option_value(ping->arr, TokenType_Pattern);
-        fill_pattern(ping->packet + sizeof(ping->icmp_hdr) + sizeof(struct timeval), pattern, ping->packet_size - sizeof(ping->icmp_hdr) - sizeof(struct timeval));
-    }
-
-    // Add timestamp to packet
-    if (have_option(ping->arr, TokenType_TimeStamp))
-    {
-        add_timestamp(ping->packet, sizeof(ping->icmp_hdr) + (pattern == NULL ? 0 : strlen(pattern)));
-    }
-
-    // Calculate checksum
-    ping->icmp_hdr.icmp_cksum = checksum((uint16_t *)ping->packet, ping->packet_size);
-    memcpy(ping->packet, &ping->icmp_hdr, sizeof(ping->icmp_hdr));
+void print_ping_banner(ft_ping *ping)
+{
+    printf("PING %s (%s) %d bytes of data.\n",
+           ping->hosts->host[0],
+           inet_ntoa(ping->dest_addr.sin_addr),
+           ping->packet_size);
 }
 
 void execute_ping(ft_ping *ping){
@@ -182,10 +228,13 @@ void execute_ping(ft_ping *ping){
 
     init_socket(ping);
     init_icmp_packet(ping);
+    init_dest_addr(ping);
     signal(SIGINT, signal_exit);
+    print_ping_banner(ping);
     while (1)
     {
         send_icmp_packet(ping);
         receive_icmp_packet(ping);
+        sleep(1); // okey
     }
 }

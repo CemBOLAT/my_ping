@@ -22,6 +22,4 @@ int main(int argc, char **argv){
 
     printArray(ping.arr);
     printStringArray(ping.hosts);
-    freeArray(ping.arr);
-    freeStringArray(ping.hosts);
 }

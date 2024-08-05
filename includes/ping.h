@@ -11,20 +11,39 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdbool.h>
+#include <netinet/ip.h> // iphdr tanımı için gerekli
+#include <netinet/in.h> // sockaddr_in tanımı için gerekli
 #include <netinet/ip_icmp.h>
 #include <netdb.h>
+
+typedef struct s_round_trip {
+    struct timeval min;
+    struct timeval max;
+    struct timeval avg;
+    struct timeval std_dev;
+
+    struct timeval sendTime;
+    struct timeval recvTime;
+
+    long sum_rtt;  // To calculate average
+    long sum_rtt_squared;  // To calculate standard deviation
+    int count;  // Number of RTT measurements
+} RoundTrip;
 
 typedef struct s_ping {
     TokenArray          *arr;
     int                 socket;
     HostArray           *hosts;
     Options             options[12];
+    RoundTrip           round_trip;
     struct addrinfo      temp_info;
     struct addrinfo      *info;
     struct sockaddr_in  dest_addr;
-    struct icmp         icmp_hdr;
+    struct icmphdr      icmp_hdr;
+    struct icmp         icmp_packet;
     char                *packet;
     int                 packet_size;
+    int                 seq;
 } ft_ping;
 
 extern ft_ping *global;

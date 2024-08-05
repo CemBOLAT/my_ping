@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <limits.h>
 
 void init_options(Options *options){
     char *op[12] = {"-v", "-?", "-f", "-l", "-n", "-w", "-W", "-p", "-s", "-T", "-t", "--ip-timestamp"};
@@ -14,11 +15,33 @@ void init_options(Options *options){
     }
 }
 
-int parse_options(int argc, char **argv, ft_ping *ping){
-    init_options(ping->options);
+void init_round_trip(RoundTrip *round_trip){
+    memset(round_trip, 0, sizeof(RoundTrip));
+    round_trip->min.tv_sec = LONG_MAX;
+    round_trip->min.tv_usec = LONG_MAX;
+    round_trip->max.tv_sec = 0;
+    round_trip->max.tv_usec = 0;
+    round_trip->count = 0;
+    round_trip->sum_rtt = 0;
+    round_trip->sum_rtt_squared = 0;
+}
+
+void init_ping(ft_ping *ping){
+    ping->socket = -1;
     ping->arr = createArray();
     ping->hosts = createStringArray();
-    ping->socket = -1;
+    bzero(&ping->temp_info, sizeof(struct addrinfo));
+    bzero(&ping->dest_addr, sizeof(struct sockaddr_in));
+    bzero(&ping->icmp_hdr, sizeof(struct icmp));
+    ping->packet = NULL;
+    ping->packet_size = 0;
+    ping->seq = 0;
+    init_options(ping->options);
+    init_round_trip(&ping->round_trip);
+}
+
+int parse_options(int argc, char **argv, ft_ping *ping){
+    init_ping(ping);
     bool isOption = false;
     for (int i = 1; i < argc; i++)
     {
