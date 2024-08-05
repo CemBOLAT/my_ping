@@ -36,6 +36,7 @@ void init_ping(ft_ping *ping){
     ping->packet = NULL;
     ping->packet_size = 0;
     ping->seq = 0;
+    ping->nbr_of_packets = 0;
     init_options(ping->options);
     init_round_trip(&ping->round_trip);
 }

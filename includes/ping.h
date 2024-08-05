@@ -28,6 +28,8 @@ typedef struct s_round_trip {
     long sum_rtt;  // To calculate average
     long sum_rtt_squared;  // To calculate standard deviation
     int count;  // Number of RTT measurements
+
+    struct timeval time;
 } RoundTrip;
 
 typedef struct s_ping {
@@ -44,6 +46,8 @@ typedef struct s_ping {
     char                *packet;
     int                 packet_size;
     int                 seq;
+
+    size_t              nbr_of_packets;
 } ft_ping;
 
 extern ft_ping *global;

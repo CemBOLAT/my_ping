@@ -101,8 +101,32 @@ void send_icmp_packet(ft_ping *ping)
         //printf("errno: %d\n", errno);
         ft_perfect_exit(ping);
     }
-
+    ping->nbr_of_packets++;
     //printf("ICMP request sent to %s\n", ping->hosts->host[0]);
+}
+
+void update_statistics(ft_ping *ping, double rtt)
+{
+    // Update min
+    double min_rtt = (ping->round_trip.min.tv_sec * 1000.0) + (ping->round_trip.min.tv_usec / 1000.0);
+    if (rtt < min_rtt || ping->round_trip.count == 0)
+    {
+        ping->round_trip.min.tv_sec = (long)(rtt / 1000.0);
+        ping->round_trip.min.tv_usec = (long)((rtt - ping->round_trip.min.tv_sec * 1000.0) * 1000.0);
+    }
+
+    // Update max
+    double max_rtt = (ping->round_trip.max.tv_sec * 1000.0) + (ping->round_trip.max.tv_usec / 1000.0);
+    if (rtt > max_rtt || ping->round_trip.count == 0)
+    {
+        ping->round_trip.max.tv_sec = (long)(rtt / 1000.0);
+        ping->round_trip.max.tv_usec = (long)((rtt - ping->round_trip.max.tv_sec * 1000.0) * 1000.0);
+    }
+
+    // Update sum for average and std deviation
+    ping->round_trip.sum_rtt += rtt;
+    ping->round_trip.sum_rtt_squared += rtt * rtt;
+    ping->round_trip.count++;
 }
 
 void receive_icmp_packet(ft_ping *ping) {
@@ -127,46 +151,23 @@ void receive_icmp_packet(ft_ping *ping) {
         if (icmp_hdr->type == ICMP_ECHOREPLY && icmp_hdr->un.echo.id == getpid()) {
             gettimeofday(&ping->round_trip.recvTime, NULL);
 
-            long rtt = (ping->round_trip.recvTime.tv_sec - ping->round_trip.sendTime.tv_sec) * 1000L +
-                       (ping->round_trip.recvTime.tv_usec - ping->round_trip.sendTime.tv_usec) / 1000L;
 
-            // Update min
-            if (rtt < (ping->round_trip.min.tv_sec * 1000L + ping->round_trip.min.tv_usec / 1000L) || ping->round_trip.count == 0) {
-                ping->round_trip.min.tv_sec = rtt / 1000L;
-                ping->round_trip.min.tv_usec = (rtt % 1000L) * 1000L;
-            }
+            double send_time = ping->round_trip.sendTime.tv_sec + (double)ping->round_trip.sendTime.tv_usec / 1000000;
+            double recv_time = ping->round_trip.recvTime.tv_sec + (double)ping->round_trip.recvTime.tv_usec / 1000000;
 
-            // Update max
-            if (rtt > (ping->round_trip.max.tv_sec * 1000L + ping->round_trip.max.tv_usec / 1000L) || ping->round_trip.count == 0) {
-                ping->round_trip.max.tv_sec = rtt / 1000L;
-                ping->round_trip.max.tv_usec = (rtt % 1000L) * 1000L;
-            }
+            double rtt = (recv_time - send_time) * 1000;
 
-            // Update sum for average and std deviation
-            ping->round_trip.sum_rtt += rtt;
-            ping->round_trip.sum_rtt_squared += rtt * rtt;
-            ping->round_trip.count++;
 
-            // Calculate average
-            long avg_rtt = ping->round_trip.sum_rtt / ping->round_trip.count;
-
-            // Calculate standard deviation
-            long avg_rtt_squared = ping->round_trip.sum_rtt_squared / ping->round_trip.count;
-            long std_dev = sqrt(avg_rtt_squared - avg_rtt * avg_rtt);
-
-            printf("%d bytes from %s: icmp_seq=%d ttl=%d time=%ld ms\n",
-                   bytes_received - ip_header_len,
+            printf("%ld bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n",
+                   bytes_received - ip_header_len + sizeof(struct icmphdr),
                    inet_ntoa(recv_addr.sin_addr),
                    icmp_hdr->un.echo.sequence,
                    ip_hdr->ttl,
                    rtt);
-            // printf("Min RTT: %ld ms\n", ping->round_trip.min.tv_sec * 1000L + ping->round_trip.min.tv_usec / 1000L);
-            // printf("Max RTT: %ld ms\n", ping->round_trip.max.tv_sec * 1000L + ping->round_trip.max.tv_usec / 1000L);
-            // printf("Avg RTT: %ld ms\n", avg_rtt);
-            // printf("Std Dev: %ld ms\n", std_dev);
+            update_statistics(ping, rtt);
         } else {
             char output[1024];
-            sprintf(output, "Received ICMP packet with type %d", icmp_hdr->type);
+            sprintf(output, "Cannot handle ICMP packet with type %d", icmp_hdr->type);
             ERROR_MESSAGE(output);
             RESET;
             bzero(output, sizeof(output));
@@ -231,6 +232,7 @@ void execute_ping(ft_ping *ping){
     init_dest_addr(ping);
     signal(SIGINT, signal_exit);
     print_ping_banner(ping);
+    gettimeofday(&ping->round_trip.time, NULL);
     while (1)
     {
         send_icmp_packet(ping);
