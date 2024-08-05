@@ -8,9 +8,10 @@ SRC := main.c \
 		./srcs/ping.c \
 		./srcs/socket.c \
 		./utils/tokenize_utils.c \
+		./utils/packetUtils.c \
+
 
 OBJ := $(SRC:.c=.o)
-
 
 all: $(NAME)
 
