@@ -133,19 +133,17 @@ void init_icmp_packet(ft_ping *ping)
 
 
 void execute_ping(ft_ping *ping){
+    // if we have -? option we should print help and exit because -? is most important option
+    if (have_option(ping->arr, TokenType_Help)){
+        YELLOW(HELP);
+        ft_perfect_exit(ping);
+    }
     // firstly if we dont have any host to ping we should exit
     if (ping->hosts->size == 0){
         ERROR_MESSAGE("ping: missing host operand");
         YELLOW(USAGE);
         ft_perfect_exit(ping);
     }
-    // if we have -? option we should print help and exit because -? is most important option
-
-    if (have_option(ping->arr, TokenType_Help)){
-        YELLOW(HELP);
-        ft_perfect_exit(ping);
-    }
-    
 
     init_socket(ping);
     init_icmp_packet(ping);
