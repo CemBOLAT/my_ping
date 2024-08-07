@@ -19,7 +19,4 @@ int main(int argc, char **argv){
     }
 
     execute_ping(&ping);
-
-    printArray(ping.arr);
-    printStringArray(ping.hosts);
 }

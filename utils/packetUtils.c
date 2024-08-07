@@ -55,16 +55,32 @@ void init_dest_addr(ft_ping *ping)
 {
     // Initialize destination address
     ping->dest_addr.sin_family = AF_INET;
-    ping->dest_addr.sin_port = 0;
-    ping->dest_addr.sin_addr.s_addr = inet_addr(ping->hosts->host[0]);
+    if (inet_pton(AF_INET, ping->hosts->host[0], &ping->dest_addr.sin_addr) != 1)
+    {
+        ERROR_MESSAGE("inet_pton");
+        ft_perfect_exit(ping);
+    }
 }
 
 void print_ping_banner(ft_ping *ping)
 {
-    printf("PING %s (%s) %d bytes of data.\n",
+    int ping_ident = getpid() & 0xFFFF;
+    if (have_option(ping->arr, TokenType_Verbose))
+    {
+        printf("PING %s (%s) %d data bytes, id 0x%04x = %u\n",
+            ping->hosts->host[0],
+            inet_ntoa(ping->dest_addr.sin_addr),
+            ping->packet_size, // dent & 0xFFFF
+            htons(ping_ident), // htons(ping_ident)
+            htons(ping_ident));
+    }
+    else
+    {
+        printf("PING %s (%s) %d data bytes\n",
            ping->hosts->host[0],
            inet_ntoa(ping->dest_addr.sin_addr),
            ping->packet_size);
+    }
 }
 
 void update_statistics(ft_ping *ping, double rtt)

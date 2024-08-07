@@ -10,6 +10,7 @@
 #include <netinet/in.h> // sockaddr_in tanımı için gerekli
 #include <limits.h>
 #include <math.h>
+#include <netinet/ip_icmp.h>
 
 void packetCycle(ft_ping *ping){
     // Clear packet memory
@@ -17,15 +18,24 @@ void packetCycle(ft_ping *ping){
 
     // Initialize ICMP header
 
-    struct icmp *icmp_hdr = (struct icmp *)ping->packet;
-    icmp_hdr->icmp_type = ICMP_ECHO;
-    icmp_hdr->icmp_code = 0;
-    icmp_hdr->icmp_id = getpid();
-    icmp_hdr->icmp_seq = ping->seq++;
-    icmp_hdr->icmp_cksum = 0;
+    // struct icmp *icmp_hdr = (struct icmp *)ping->packet;
+    // icmp_hdr->icmp_type = ICMP_ECHO;
+    // icmp_hdr->icmp_code = 0;
+    // icmp_hdr->icmp_id = getpid();
+    // icmp_hdr->icmp_seq = ping->seq++;
+    // icmp_hdr->icmp_cksum = 0;
 
-    // Copy ICMP header to packet
-    memcpy(ping->packet, icmp_hdr, sizeof(struct icmp));
+    // // Copy ICMP header to packet
+    // memcpy(ping->packet, icmp_hdr, sizeof(struct icmp));
+
+    struct icmphdr *icmp_hdr = (struct icmphdr *)ping->packet;
+    icmp_hdr->type = ICMP_ECHO;
+    icmp_hdr->code = 0;
+    icmp_hdr->checksum = 0;
+    icmp_hdr->un.echo.id = getpid();
+    icmp_hdr->un.echo.sequence = htons(ping->seq);
+
+    memcpy(ping->packet, icmp_hdr, sizeof(struct icmphdr));
 
     // Add pattern to packet if specified
     const char *pattern = NULL;
@@ -42,7 +52,7 @@ void packetCycle(ft_ping *ping){
     }
 
     // Calculate checksum
-    icmp_hdr->icmp_cksum = checksum((uint16_t *)ping->packet, ping->packet_size);
+    icmp_hdr->checksum = checksum((uint16_t *)ping->packet, ping->packet_size);
 
     // Copy ICMP header to packet
 
@@ -61,6 +71,7 @@ void send_icmp_packet(ft_ping *ping)
         ft_perfect_exit(ping);
     }
     ping->nbr_of_packets++;
+    ping->seq++;
     //printf("ICMP request sent to %s\n", ping->hosts->host[0]);
 }
 
@@ -72,8 +83,8 @@ void receive_icmp_packet(ft_ping *ping) {
     
     if (bytes_received < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
-            RED("Request timed out.\n");
-            RESET;
+            // RED("Request timed out.\n");
+            // RESET;
         } else {
             ERROR_MESSAGE("recvfrom");
             ft_perfect_exit(ping);
@@ -93,10 +104,10 @@ void receive_icmp_packet(ft_ping *ping) {
             double rtt = (recv_time - send_time) * 1000;
 
 
-            printf("%ld bytes from %s: icmp_seq=%d ttl=%d time=%.1f ms\n",
-                   bytes_received - ip_header_len + sizeof(struct icmphdr),
+            printf("%ld bytes from %s: icmp_seq=%lu ttl=%d time=%.3f ms\n",
+                   bytes_received - ip_header_len,
                    inet_ntoa(recv_addr.sin_addr),
-                   icmp_hdr->un.echo.sequence,
+                   ntohs(icmp_hdr->un.echo.sequence),
                    ip_hdr->ttl,
                    rtt);
             update_statistics(ping, rtt);
@@ -145,9 +156,13 @@ void execute_ping(ft_ping *ping){
         ft_perfect_exit(ping);
     }
 
+    if (is_ipv4(ping->hosts->host[0]) == false){
+        ERROR_MESSAGE("./ft_ping: unknown host");
+        ft_perfect_exit(ping);
+    }
+
     init_socket(ping);
     init_icmp_packet(ping);
-    init_dest_addr(ping);
     signal(SIGINT, signal_exit);
     print_ping_banner(ping);
     gettimeofday(&ping->round_trip.time, NULL);

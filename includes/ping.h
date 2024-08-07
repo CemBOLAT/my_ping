@@ -70,3 +70,4 @@ void        add_timestamp(char *packet, size_t offset);
 void        init_dest_addr(ft_ping *ping);
 void        print_ping_banner(ft_ping *ping);
 void        update_statistics(ft_ping *ping, double rtt);
+bool        is_ipv4(char *str);

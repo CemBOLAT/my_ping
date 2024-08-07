@@ -40,7 +40,7 @@ typedef enum s_TokenType {
 #define DEFAULT_TIMEOUT 1
 #define DEFAULT_TIME_TO_LIVE 64
 
-#define DEFAULT_PACKET_SIZE 56
+#define DEFAULT_PACKET_SIZE 64
 
 typedef struct Token {
     TokenType type;

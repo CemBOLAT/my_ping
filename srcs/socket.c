@@ -18,8 +18,9 @@ void init_socket(ft_ping *ping){
         ERROR_MESSAGE("socket");
         ft_perfect_exit(ping);
     }
-    // set the socket options
-
+    // init dest_addr
+    init_dest_addr(ping);
+    
     // TIME TO LIVE
     setsockopt_custom(ping, IPPROTO_IP, IP_TTL, TokenType_TimeToLive, DEFAULT_TIME_TO_LIVE);
 
