@@ -14,7 +14,7 @@
 
 void packetCycle(ft_ping *ping){
     // Clear packet memory
-    memset(ping->packet, 0, ping->packet_size);
+    memset(ping->packet, 0, ping->packet_size + sizeof(struct icmphdr));
 
     // Initialize ICMP header
 
@@ -63,7 +63,7 @@ void send_icmp_packet(ft_ping *ping)
 {
     packetCycle(ping);
     gettimeofday(&ping->round_trip.sendTime, NULL);
-    if (sendto(ping->socket, ping->packet, ping->packet_size, 0, (struct sockaddr *)&ping->dest_addr, sizeof(ping->dest_addr)) <= 0)
+    if (sendto(ping->socket, ping->packet, ping->packet_size + sizeof(struct icmphdr), 0, (struct sockaddr *)&ping->dest_addr, sizeof(ping->dest_addr)) <= 0)
     {
         ERROR_MESSAGE("sendto");
         // use errno to determine the cause of the error
@@ -125,6 +125,7 @@ void init_icmp_packet(ft_ping *ping)
 {
     // Parse packet size from options
     ping->packet_size = have_option(ping->arr, TokenType_PacketSize) ? atoi(get_option_value(ping->arr, TokenType_PacketSize)) : DEFAULT_PACKET_SIZE;
+    
     if (ping->packet_size > 65399)
     {
         char output[1024];
@@ -134,7 +135,7 @@ void init_icmp_packet(ft_ping *ping)
     }
 
     // Allocate memory for packet
-    ping->packet = (char *)malloc(ping->packet_size);
+    ping->packet = (char *)malloc(ping->packet_size + sizeof(struct icmphdr));
     if (ping->packet == NULL)
     {
         ERROR_MESSAGE("malloc");

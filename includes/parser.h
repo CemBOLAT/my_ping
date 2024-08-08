@@ -28,8 +28,8 @@ typedef enum s_TokenType {
         -w	            Zaman aşımı süresi belirler.	        Zaman aşımı süresi (saniye)	    1
         -W	            Her paket için bekleme süresi.	        Bekleme süresi (saniye)	        1
         -p              (Pattern)	Veri bölümüne model ekler.	Model (pattern)	                1
-        -s	            Paket boyutunu belirler.	            Paket boyutu (bayt)	            1
-        -T	            Zaman damgası ekler.	                Almaz	                        0
+        -s	            Paket boyutunu belirler.	            Paket boyutu (bayt)	            1 (done)
+        -T	            Zaman damgası ekler.	                Almaz	                        0 
         -t	            TTL değerini belirler.	                TTL değeri	                    1
         --ip-timestamp	IP zaman damgası ekler.	                Almaz	                        0
     */
@@ -40,7 +40,7 @@ typedef enum s_TokenType {
 #define DEFAULT_TIMEOUT 1
 #define DEFAULT_TIME_TO_LIVE 64
 
-#define DEFAULT_PACKET_SIZE 64
+#define DEFAULT_PACKET_SIZE 56
 
 typedef struct Token {
     TokenType type;
