@@ -80,6 +80,8 @@ void receive_icmp_packet(ft_ping *ping) {
     struct sockaddr_in recv_addr;
     socklen_t addr_len = sizeof(recv_addr);
     int bytes_received = recvfrom(ping->socket, buffer, sizeof(buffer), 0, (struct sockaddr *)&recv_addr, &addr_len);
+
+    bool isFlooding = have_option(ping->arr, TokenType_Flood);
     
     if (bytes_received < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -104,12 +106,15 @@ void receive_icmp_packet(ft_ping *ping) {
             double rtt = (recv_time - send_time) * 1000;
 
 
-            printf("%ld bytes from %s: icmp_seq=%lu ttl=%d time=%.3f ms\n",
-                   bytes_received - ip_header_len,
-                   inet_ntoa(recv_addr.sin_addr),
-                   ntohs(icmp_hdr->un.echo.sequence),
-                   ip_hdr->ttl,
-                   rtt);
+            if (isFlooding == false){
+                printf("%ld bytes from %s: icmp_seq=%lu ttl=%d time=%.3f ms\n",
+                                bytes_received - ip_header_len,
+                                inet_ntoa(recv_addr.sin_addr),
+                                ntohs(icmp_hdr->un.echo.sequence),
+                                ip_hdr->ttl,
+                                rtt);
+            }
+            
             update_statistics(ping, rtt);
         } else {
             char output[1024];
@@ -145,6 +150,32 @@ void init_icmp_packet(ft_ping *ping)
     packetCycle(ping);
 }
 
+void preloadOption(ft_ping *ping)
+{
+    if (have_option(ping->arr, TokenType_Preload)){
+        int preload = atoi(get_option_value(ping->arr, TokenType_Preload));
+        for (int i = 0; i < preload; i++){
+            send_icmp_packet(ping);
+            receive_icmp_packet(ping);
+        }
+    }
+}
+
+void floodOption(ft_ping *ping)
+{
+    int count = 0;
+    if (have_option(ping->arr, TokenType_Flood)){
+        while (1){
+            send_icmp_packet(ping);
+            receive_icmp_packet(ping);
+            count++;
+            if (count % 400 == 0){
+                printf(".....");
+            }
+        }
+    }
+}
+
 
 void execute_ping(ft_ping *ping){
     // if we have -? option we should print help and exit because -? is most important option
@@ -169,6 +200,8 @@ void execute_ping(ft_ping *ping){
     signal(SIGINT, signal_exit);
     print_ping_banner(ping);
     gettimeofday(&ping->round_trip.time, NULL);
+    preloadOption(ping);
+    floodOption(ping);
     while (1)
     {
         send_icmp_packet(ping);

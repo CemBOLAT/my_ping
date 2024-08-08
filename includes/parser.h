@@ -20,10 +20,10 @@ typedef enum s_TokenType {
         Mixtape Usage of the ping commands parameters
         -v : Tüm parametreler ile beraber kullanılabilir.
         Parametre	    Açıklama	                            Değişken	                    Değişken Sayısı
-        -v	            Ayrıntılı çıktı üretir.	                Almaz	                        0
-        -?	            Yardım bilgilerini gösterir.	        Almaz	                        0
-        -f	            Hedefe hızlı paket gönderir.	        Almaz	                        0
-        -l	            Önce belirli miktar veri gönderir.	    Gönderilecek paket sayısı	    1
+        -v	            Ayrıntılı çıktı üretir.	                Almaz	                        0 (done)
+        -?	            Yardım bilgilerini gösterir.	        Almaz	                        0 (done)
+        -f	            Hedefe hızlı paket gönderir.	        Almaz	                        0 (done)
+        -l	            Önce belirli miktar veri gönderir.	    Gönderilecek paket sayısı	    1 (done)
         -n	            Sayısal IP adresleri gösterir.	        Almaz	                        0
         -w	            Zaman aşımı süresi belirler.	        Zaman aşımı süresi (saniye)	    1
         -W	            Her paket için bekleme süresi.	        Bekleme süresi (saniye)	        1
