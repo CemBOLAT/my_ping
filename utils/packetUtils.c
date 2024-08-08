@@ -85,24 +85,35 @@ void print_ping_banner(ft_ping *ping)
 
 void update_statistics(ft_ping *ping, double rtt)
 {
-    // Update min
-    double min_rtt = (ping->round_trip.min.tv_sec * 1000.0) + (ping->round_trip.min.tv_usec / 1000.0);
-    if (rtt < min_rtt || ping->round_trip.count == 0)
+    // Update min and max
+    if (rtt < ping->round_trip.min)
     {
-        ping->round_trip.min.tv_sec = (long)(rtt / 1000.0);
-        ping->round_trip.min.tv_usec = (long)((rtt - ping->round_trip.min.tv_sec * 1000.0) * 1000.0);
+        ping->round_trip.min = rtt;
     }
 
-    // Update max
-    double max_rtt = (ping->round_trip.max.tv_sec * 1000.0) + (ping->round_trip.max.tv_usec / 1000.0);
-    if (rtt > max_rtt || ping->round_trip.count == 0)
+    if (rtt > ping->round_trip.max)
     {
-        ping->round_trip.max.tv_sec = (long)(rtt / 1000.0);
-        ping->round_trip.max.tv_usec = (long)((rtt - ping->round_trip.max.tv_sec * 1000.0) * 1000.0);
+        ping->round_trip.max = rtt;
     }
+
+    // Update average
+    ping->round_trip.avg = ping->round_trip.sum_rtt / ping->round_trip.count;
+
+    // Update standard deviation
+
+    // Calculate variance
+    double variance = (ping->round_trip.sum_rtt_squared / ping->round_trip.count) - (ping->round_trip.avg * ping->round_trip.avg);
+
+    // Calculate standard deviation
+
+    ping->round_trip.std_dev = sqrt(variance);
 
     // Update sum for average and std deviation
     ping->round_trip.sum_rtt += rtt;
     ping->round_trip.sum_rtt_squared += rtt * rtt;
+
+    // printf("Intermediate sum rtt = %.3f ms\n", ping->round_trip.sum_rtt);
+    // printf("Intermediate sum rtt squared = %.3f ms\n", ping->round_trip.sum_rtt_squared);
+
     ping->round_trip.count++;
 }

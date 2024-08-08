@@ -17,16 +17,16 @@
 #include <netdb.h>
 
 typedef struct s_round_trip {
-    struct timeval min;
-    struct timeval max;
-    struct timeval avg;
-    struct timeval std_dev;
+    double min;
+    double max;
+    double avg;
+    double std_dev;
 
     struct timeval sendTime;
     struct timeval recvTime;
 
-    long sum_rtt;  // To calculate average
-    long sum_rtt_squared;  // To calculate standard deviation
+    double sum_rtt;  // To calculate average
+    double sum_rtt_squared;  // To calculate standard deviation
     int count;  // Number of RTT measurements
 
     struct timeval time;

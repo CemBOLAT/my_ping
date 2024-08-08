@@ -38,6 +38,9 @@ void signal_exit(int signum){
 
     if (packets_received > 0)
     {
+        // printf("Final sum rtt = %.3f ms\n", global->round_trip.sum_rtt);
+        // printf("Final sum rtt squared = %.3f ms\n", global->round_trip.sum_rtt_squared);
+
         printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n",
                 global->round_trip.min, global->round_trip.avg, global->round_trip.max, global->round_trip.std_dev);
     }

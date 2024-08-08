@@ -15,15 +15,17 @@ void init_options(Options *options){
     }
 }
 
-void init_round_trip(RoundTrip *round_trip){
-    memset(round_trip, 0, sizeof(RoundTrip));
-    round_trip->min.tv_sec = LONG_MAX;
-    round_trip->min.tv_usec = LONG_MAX;
-    round_trip->max.tv_sec = 0;
-    round_trip->max.tv_usec = 0;
-    round_trip->count = 0;
-    round_trip->sum_rtt = 0;
-    round_trip->sum_rtt_squared = 0;
+void init_round_trip(ft_ping *ping){
+    memset(&ping->round_trip, 0, sizeof(RoundTrip));
+    ping->round_trip.min = INT_MAX;
+    ping->round_trip.avg = 0.0;
+    ping->round_trip.max = INT_MIN;
+    ping->round_trip.std_dev = 0.0;
+
+    ping->round_trip.sum_rtt = 0.0;
+    ping->round_trip.sum_rtt_squared = 0.0;
+    ping->round_trip.count = 0;
+    
 }
 
 void init_ping(ft_ping *ping){
@@ -38,7 +40,7 @@ void init_ping(ft_ping *ping){
     ping->seq = 0;
     ping->nbr_of_packets = 0;
     init_options(ping->options);
-    init_round_trip(&ping->round_trip);
+    init_round_trip(ping);
 }
 
 int parse_options(int argc, char **argv, ft_ping *ping){

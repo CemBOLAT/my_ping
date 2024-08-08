@@ -125,9 +125,11 @@ void init_icmp_packet(ft_ping *ping)
 {
     // Parse packet size from options
     ping->packet_size = have_option(ping->arr, TokenType_PacketSize) ? atoi(get_option_value(ping->arr, TokenType_PacketSize)) : DEFAULT_PACKET_SIZE;
-    if (ping->packet_size < sizeof(struct icmp) + sizeof(struct timeval))
+    if (ping->packet_size > 65399)
     {
-        ERROR_MESSAGE("ping: packet size too small");
+        char output[1024];
+        sprintf(output, "./ft_ping: option value too big: %d", ping->packet_size);
+        ERROR_MESSAGE(output);
         ft_perfect_exit(ping);
     }
 
