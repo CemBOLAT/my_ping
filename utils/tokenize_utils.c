@@ -1,6 +1,7 @@
 #include "../includes/ping.h"
 #include <ctype.h>
 #include <stdbool.h>
+#include <string.h>
 
 bool have_option(TokenArray *arr, TokenType type){
     for (int i = 0; i < arr->size; i++)
@@ -46,7 +47,7 @@ bool isNumber(char *str){
     return true;
 }
 
-bool is_ipv4(char *str){
+bool is_ipv4(char *str, ft_ping *ping){
     int each_dot_part = 0;
     int nbr_of_dots = 0;
     for (int i = 0; str[i] != '\0'; i++)
@@ -68,5 +69,31 @@ bool is_ipv4(char *str){
     if (each_dot_part > 255 || nbr_of_dots != 3){
         return false;
     }
+    memcpy(ping->ip_str, str, strlen(str) + 1);
+    return true;
+}
+
+bool is_fdqn(char *str, ft_ping *ping)
+{
+    struct addrinfo hints, *res;
+    int status;
+    
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_INET;  // Sadece IPv4
+    hints.ai_socktype = SOCK_STREAM;  // TCP bağlantı
+
+        // getaddrinfo çağrısını yap
+    if ((status = getaddrinfo(str, NULL, &hints, &res)) != 0) {
+        return false;  // DNS çözümlemesi başarısız
+    }
+
+    struct sockaddr_in *ipv4 = (struct sockaddr_in *)res->ai_addr;
+    void *addr = &(ipv4->sin_addr);
+
+    // IP adresini string olarak dönüştür
+    inet_ntop(res->ai_family, addr, ping->ip_str, sizeof ping->ip_str);
+
+    freeaddrinfo(res);  // Bellek sızıntısını önlemek için bellek boşalt
+
     return true;
 }

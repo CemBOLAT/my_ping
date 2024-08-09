@@ -55,7 +55,7 @@ void init_dest_addr(ft_ping *ping)
 {
     // Initialize destination address
     ping->dest_addr.sin_family = AF_INET;
-    if (inet_pton(AF_INET, ping->hosts->host[0], &ping->dest_addr.sin_addr) != 1)
+    if (inet_pton(AF_INET, ping->ip_str, &ping->dest_addr.sin_addr) != 1)
     {
         ERROR_MESSAGE("inet_pton");
         ft_perfect_exit(ping);

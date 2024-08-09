@@ -48,6 +48,7 @@ typedef struct s_ping {
     int                 seq;
 
     size_t              nbr_of_packets;
+    char                ip_str[INET_ADDRSTRLEN];
 } ft_ping;
 
 extern ft_ping *global;
@@ -70,4 +71,5 @@ void        add_timestamp(char *packet, size_t offset);
 void        init_dest_addr(ft_ping *ping);
 void        print_ping_banner(ft_ping *ping);
 void        update_statistics(ft_ping *ping, double rtt);
-bool        is_ipv4(char *str);
+bool        is_ipv4(char *str, ft_ping *ping);
+bool is_fdqn(char *str, ft_ping *ping);

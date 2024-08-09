@@ -190,7 +190,7 @@ void execute_ping(ft_ping *ping){
         ft_perfect_exit(ping);
     }
 
-    if (is_ipv4(ping->hosts->host[0]) == false){
+    if (is_ipv4(ping->hosts->host[0], ping) == false && is_fdqn(ping->hosts->host[0], ping) == false){
         ERROR_MESSAGE("./ft_ping: unknown host");
         ft_perfect_exit(ping);
     }
