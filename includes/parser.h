@@ -25,8 +25,8 @@ typedef enum s_TokenType {
         -f	            Hedefe hızlı paket gönderir.	        Almaz	                        0 (done)
         -l	            Önce belirli miktar veri gönderir.	    Gönderilecek paket sayısı	    1 (done)
         -n	            Sayısal IP adresleri gösterir.	        Almaz	                        0
-        -w	            Zaman aşımı süresi belirler.	        Zaman aşımı süresi (saniye)	    1
-        -W	            Her paket için bekleme süresi.	        Bekleme süresi (saniye)	        1
+        -w	            stop after N seconds	                Zaman aşımı süresi (saniye)	    1 (half done)
+        -W	            number of seconds to wait for response	        Bekleme süresi (saniye)	        1
         -p              (Pattern)	Veri bölümüne model ekler.	Model (pattern)	                1
         -s	            Paket boyutunu belirler.	            Paket boyutu (bayt)	            1 (done)
         -T	            Zaman damgası ekler.	                Almaz	                        0 

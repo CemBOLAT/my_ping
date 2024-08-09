@@ -176,6 +176,26 @@ void floodOption(ft_ping *ping)
     }
 }
 
+void deadlineOption(ft_ping *ping)
+{
+    printf("Deadline option\n");
+    struct timeval end;
+    size_t deadlineValue = atoi(get_option_value(ping->arr, TokenType_Deadline));
+    // the program sends ping but ends after n seconds
+    if (have_option(ping->arr, TokenType_Deadline)){
+        while (1)
+        {
+            gettimeofday(&end, NULL);
+            if (end.tv_sec - ping->round_trip.time.tv_sec >= deadlineValue){
+                signal_exit(SIGINT);
+            }
+            send_icmp_packet(ping);
+            receive_icmp_packet(ping);
+            sleep(1);
+        }
+    }
+}
+
 
 void execute_ping(ft_ping *ping){
     // if we have -? option we should print help and exit because -? is most important option
@@ -202,6 +222,7 @@ void execute_ping(ft_ping *ping){
     gettimeofday(&ping->round_trip.time, NULL);
     preloadOption(ping);
     floodOption(ping);
+    deadlineOption(ping);
     while (1)
     {
         send_icmp_packet(ping);
