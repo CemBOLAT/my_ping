@@ -72,6 +72,7 @@ void send_icmp_packet(ft_ping *ping)
     }
     ping->nbr_of_packets++;
     ping->seq++;
+    ping->is_received = false;
     //printf("ICMP request sent to %s\n", ping->hosts->host[0]);
 }
 
@@ -105,6 +106,7 @@ void receive_icmp_packet(ft_ping *ping) {
 
             double rtt = (recv_time - send_time) * 1000;
 
+            ping->is_received = true;
 
             if (isFlooding == false){
                 printf("%ld bytes from %s: icmp_seq=%lu ttl=%d time=%.3f ms\n",
@@ -188,6 +190,7 @@ void execute_ping(ft_ping *ping){
 
     struct timeval end;
     size_t deadlineValue = ping->parametersvalue & TokenType_Deadline ? atoi(get_option_value(ping->arr, TokenType_Deadline)) : DEFAULT_DEADLINE;
+    size_t timeoutValue = ping->parametersvalue & TokenType_Timeout ? atoi(get_option_value(ping->arr, TokenType_Timeout)) : DEFAULT_TIMEOUT;
 
     while (1)
     {
@@ -198,13 +201,26 @@ void execute_ping(ft_ping *ping){
             }
         }
         send_icmp_packet(ping);
-        receive_icmp_packet(ping);
-        if (!ping->parametersvalue & TokenType_Flood){
-            if (ping->seq % 400 = 0)
+        if (ping->parametersvalue & TokenType_Timeout){
+            while (1){
+                gettimeofday(&end, NULL);
+                if (end.tv_sec - ping->round_trip.sendTime.tv_sec >= timeoutValue)
+                    break;
+                if (ping->is_received)
+                    break;
+                receive_icmp_packet(ping);
+            }
+        }
+        else {
+            receive_icmp_packet(ping);
+        }
+        if (ping->parametersvalue & TokenType_Flood){
+            if (ping->seq % 400 == 0)
             {
                 printf(".....");
             }
-            sleep(1); // okey
         }
+        else
+            sleep(1); // okey
     }
 }

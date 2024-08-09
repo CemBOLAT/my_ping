@@ -24,14 +24,27 @@ typedef enum s_TokenType {
         -?	            Yardım bilgilerini gösterir.	        Almaz	                        0 (done)
         -f	            Hedefe hızlı paket gönderir.	        Almaz	                        0 (done)
         -l	            Önce belirli miktar veri gönderir.	    Gönderilecek paket sayısı	    1 (done)
-        -n	            Sayısal IP adresleri gösterir.	        Almaz	                        0
-        -w	            stop after N seconds	                Zaman aşımı süresi (saniye)	    1 (half done)
+        -n	            Sayısal IP adresleri gösterir.	        Almaz	                        0 (no need to done)
+        -w	            stop after N seconds	                Zaman aşımı süresi (saniye)	    1 (done)
         -W	            number of seconds to wait for response	        Bekleme süresi (saniye)	        1
         -p              (Pattern)	Veri bölümüne model ekler.	Model (pattern)	                1
         -s	            Paket boyutunu belirler.	            Paket boyutu (bayt)	            1 (done)
-        -T	            Zaman damgası ekler.	                Almaz	                        0 
-        -t	            TTL değerini belirler.	                TTL değeri	                    1
-        --ip-timestamp	IP zaman damgası ekler.	                Almaz	                        0
+        -T	            set type of service (TOS) to NUM        alır                            1
+        -t	            send paket types                        alır                            1 
+        --ip-timestamp	IP zaman damgası ekler.	                alır(tsonly and tsaddr)         1
+    */
+    /*
+        -t için
+        echo: Sends ICMP echo request packets (the default).
+        address: Sends ICMP address mask requests.
+        mask: Same as address, sends ICMP address mask requests.
+        timestamp: Sends ICMP timestamp requests.
+
+
+        When you use --ip-timestamp=tsonly, the IP packets sent by ping will include a timestamp option that only records the time at which the packet reaches each hop along its route. This option can record up to nine timestamps, providing information on how long the packet took to reach each hop.
+tsaddr:
+
+When you use --ip-timestamp=tsaddr, the IP packets will include a timestamp option that records both the time and the IP address of each hop the packet passes through. However, this option can only record up to four hops due to the additional space required for storing IP addresses.
     */
 }TokenType;
 
