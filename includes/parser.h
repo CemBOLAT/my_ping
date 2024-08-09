@@ -3,19 +3,19 @@
 #include "text_engine.h"
 
 typedef enum s_TokenType {
-    TokenType_Verbose, // -v // ayrıntı ekle
-    TokenType_Help, // -? // yardım
-    TokenType_Flood, // -f // paketi hızlı gönder fakat daha az ayrıntı
-    TokenType_Preload, // -l // Önce belirli bir miktar veri gönder ve sonra gerçek veriyi gönder -l 10 ile 10 tane veri gönder
-    TokenType_Numeric, // -n // IP adreslerini sayısal olarak göster DNS çözümleme yapma
-    TokenType_Deadline, // -w // Zaman aşımı süresi
-    TokenType_Timeout, // -W // Zaman aşımı süresi
-    TokenType_Pattern, // -p // Gönderilen paketlerin veri bölümüne bir model (pattern) ekler. Örneğin, -p ff her paket verisini ff ile doldurur.
-    TokenType_PacketSize, // -s // Paket boyutu -s 100 100 baytlık ICMP paketleri gönderir.
-    TokenType_TimeStamp, // -T // Zaman damgası ekle
-    TokenType_TimeToLive, // -t // TTL değeri bu paketin kaç hop geçebileceğini belirler
-    TokenType_Ip_TimeStamp, // --ip-timestamp // IP zaman damgası ekle  Bu, paketlerin ne zaman gönderildiği ve alındığı hakkında bilgi sağlar.
-    TokenType_None,
+    TokenType_None        = 0,    // No flag
+    TokenType_Verbose     = 1,    // 1 << 0
+    TokenType_Help        = 2,    // 1 << 1
+    TokenType_Flood       = 4,    // 1 << 2
+    TokenType_Preload     = 8,    // 1 << 3
+    TokenType_Numeric     = 16,   // 1 << 4
+    TokenType_Deadline    = 32,   // 1 << 5
+    TokenType_Timeout     = 64,   // 1 << 6
+    TokenType_Pattern     = 128,  // 1 << 7
+    TokenType_PacketSize  = 256,  // 1 << 8
+    TokenType_TimeStamp   = 512,  // 1 << 9
+    TokenType_TimeToLive  = 1024, // 1 << 10
+    TokenType_Ip_TimeStamp= 2048  // 1 << 11
     /*
         Mixtape Usage of the ping commands parameters
         -v : Tüm parametreler ile beraber kullanılabilir.
@@ -35,8 +35,11 @@ typedef enum s_TokenType {
     */
 }TokenType;
 
+
 // Setsockopt parameters.
-#define DEFAULT_DEADLINE 5
+#define DEFAULT_DEADLINE -1
+
+
 #define DEFAULT_TIMEOUT 1
 #define DEFAULT_TIME_TO_LIVE 64
 

@@ -21,6 +21,7 @@ typedef struct HostArray {
 typedef struct Options {
     char    *option;
     int     value;
+    int numericValue;
 } Options;
 
 TokenArray* createArray();

@@ -65,7 +65,7 @@ void init_dest_addr(ft_ping *ping)
 void print_ping_banner(ft_ping *ping)
 {
     int ping_ident = getpid() & 0xFFFF;
-    if (have_option(ping->arr, TokenType_Verbose))
+    if (ping->parametersvalue & TokenType_Verbose)
     {
         printf("PING %s (%s) %d data bytes, id 0x%04x = %u\n",
             ping->hosts->host[0],

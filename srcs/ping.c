@@ -39,14 +39,14 @@ void packetCycle(ft_ping *ping){
 
     // Add pattern to packet if specified
     const char *pattern = NULL;
-    if (have_option(ping->arr, TokenType_Pattern))
+    if (ping->parametersvalue & TokenType_Pattern)
     {
         pattern = get_option_value(ping->arr, TokenType_Pattern);
         fill_pattern(ping->packet + sizeof(struct icmp) + sizeof(struct timeval), pattern, ping->packet_size - sizeof(struct icmp) - sizeof(struct timeval));
     }
 
     // Add timestamp to packet
-    if (have_option(ping->arr, TokenType_TimeStamp))
+    if (ping->parametersvalue & TokenType_TimeStamp)
     {
         add_timestamp(ping->packet, sizeof(struct icmp) + (pattern == NULL ? 0 : strlen(pattern)));
     }
@@ -81,7 +81,7 @@ void receive_icmp_packet(ft_ping *ping) {
     socklen_t addr_len = sizeof(recv_addr);
     int bytes_received = recvfrom(ping->socket, buffer, sizeof(buffer), 0, (struct sockaddr *)&recv_addr, &addr_len);
 
-    bool isFlooding = have_option(ping->arr, TokenType_Flood);
+    bool isFlooding = ping->parametersvalue & TokenType_Flood;
     
     if (bytes_received < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -129,7 +129,7 @@ void receive_icmp_packet(ft_ping *ping) {
 void init_icmp_packet(ft_ping *ping)
 {
     // Parse packet size from options
-    ping->packet_size = have_option(ping->arr, TokenType_PacketSize) ? atoi(get_option_value(ping->arr, TokenType_PacketSize)) : DEFAULT_PACKET_SIZE;
+    ping->packet_size = ping->parametersvalue & TokenType_PacketSize ? atoi(get_option_value(ping->arr, TokenType_PacketSize)) : DEFAULT_PACKET_SIZE;
     
     if (ping->packet_size > 65399)
     {
@@ -152,7 +152,7 @@ void init_icmp_packet(ft_ping *ping)
 
 void preloadOption(ft_ping *ping)
 {
-    if (have_option(ping->arr, TokenType_Preload)){
+    if (ping->parametersvalue & TokenType_Preload){
         int preload = atoi(get_option_value(ping->arr, TokenType_Preload));
         for (int i = 0; i < preload; i++){
             send_icmp_packet(ping);
@@ -161,45 +161,9 @@ void preloadOption(ft_ping *ping)
     }
 }
 
-void floodOption(ft_ping *ping)
-{
-    int count = 0;
-    if (have_option(ping->arr, TokenType_Flood)){
-        while (1){
-            send_icmp_packet(ping);
-            receive_icmp_packet(ping);
-            count++;
-            if (count % 400 == 0){
-                printf(".....");
-            }
-        }
-    }
-}
-
-void deadlineOption(ft_ping *ping)
-{
-    printf("Deadline option\n");
-    struct timeval end;
-    size_t deadlineValue = atoi(get_option_value(ping->arr, TokenType_Deadline));
-    // the program sends ping but ends after n seconds
-    if (have_option(ping->arr, TokenType_Deadline)){
-        while (1)
-        {
-            gettimeofday(&end, NULL);
-            if (end.tv_sec - ping->round_trip.time.tv_sec >= deadlineValue){
-                signal_exit(SIGINT);
-            }
-            send_icmp_packet(ping);
-            receive_icmp_packet(ping);
-            sleep(1);
-        }
-    }
-}
-
-
 void execute_ping(ft_ping *ping){
     // if we have -? option we should print help and exit because -? is most important option
-    if (have_option(ping->arr, TokenType_Help)){
+    if (ping->parametersvalue & TokenType_Help){
         YELLOW(HELP);
         ft_perfect_exit(ping);
     }
@@ -221,12 +185,26 @@ void execute_ping(ft_ping *ping){
     print_ping_banner(ping);
     gettimeofday(&ping->round_trip.time, NULL);
     preloadOption(ping);
-    floodOption(ping);
-    deadlineOption(ping);
+
+    struct timeval end;
+    size_t deadlineValue = ping->parametersvalue & TokenType_Deadline ? atoi(get_option_value(ping->arr, TokenType_Deadline)) : DEFAULT_DEADLINE;
+
     while (1)
     {
+        if (ping->parametersvalue & TokenType_Deadline){
+            gettimeofday(&end, NULL);
+            if (end.tv_sec - ping->round_trip.time.tv_sec >= deadlineValue){
+                signal_exit(SIGINT);
+            }
+        }
         send_icmp_packet(ping);
         receive_icmp_packet(ping);
-        sleep(1); // okey
+        if (!ping->parametersvalue & TokenType_Flood){
+            if (ping->seq % 400 = 0)
+            {
+                printf(".....");
+            }
+            sleep(1); // okey
+        }
     }
 }

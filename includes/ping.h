@@ -49,6 +49,7 @@ typedef struct s_ping {
 
     size_t              nbr_of_packets;
     char                ip_str[INET_ADDRSTRLEN];
+    int                 parametersvalue;
 } ft_ping;
 
 extern ft_ping *global;

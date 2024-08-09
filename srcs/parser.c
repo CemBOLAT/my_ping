@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <limits.h>
+#include <math.h>
 
 void init_options(Options *options){
     char *op[12] = {"-v", "-?", "-f", "-l", "-n", "-w", "-W", "-p", "-s", "-T", "-t", "--ip-timestamp"};
@@ -12,6 +13,7 @@ void init_options(Options *options){
     {
         options[i].option = op[i];
         options[i].value = values[i];
+        options[i].numericValue = pow((i + 1), 2);
     }
 }
 
@@ -39,6 +41,7 @@ void init_ping(ft_ping *ping){
     ping->packet_size = 0;
     ping->seq = 0;
     ping->nbr_of_packets = 0;
+    ping->parametersvalue = 0;
     init_options(ping->options);
     init_round_trip(ping);
 }
@@ -59,6 +62,7 @@ int parse_options(int argc, char **argv, ft_ping *ping){
                     isOption = true;
                     Token token;
                     token.type = j;
+                    ping->parametersvalue |= ping->options[j].numericValue;
                     if (ping->options[j].value == 1)
                     {
                         if (i + 1 == argc)
