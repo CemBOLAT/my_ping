@@ -12,7 +12,7 @@ typedef enum s_TokenType {
     TokenType_Timeout     = 64,   // 1 << 6 -W
     TokenType_Pattern     = 128,  // 1 << 7 -p 
     TokenType_PacketSize  = 256,  // 1 << 8 -s (done)
-    TokenType_TimeStamp   = 512,  // 1 << 9 -T
+    TokenType_TOS         = 512,  // 1 << 9 -T
     TokenType_SendPacketType  = 1024, // 1 << 10 -t
     TokenType_Ip_TimeStamp= 2048,  // 1 << 11 --ip-timestamp
     TokenType_None        = 0      // No flag
@@ -29,8 +29,8 @@ typedef enum s_TokenType {
         -W	            number of seconds to wait for response	        Bekleme süresi (saniye)	1 (done)
         -p              (Pattern)	Veri bölümüne model ekler.	Model (pattern)	                1 (done)
         -s	            Paket boyutunu belirler.	            Paket boyutu (bayt)	            1 (done)
-        -T	            set type of service (TOS) to NUM        alır                            1 
-        -t	            send paket types                        alır                            1 
+        -T	            set type of service (TOS) to NUM        alır                            1  (done)
+        -t	            send paket types                        alır                            1 (done)
         --ip-timestamp	IP zaman damgası ekler.	                alır(tsonly and tsaddr)         1
     */
     /*

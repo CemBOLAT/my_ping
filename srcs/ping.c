@@ -12,6 +12,34 @@
 #include <math.h>
 #include <netinet/ip_icmp.h>
 
+// Helper function to add IP timestamp option
+void add_ip_timestamp_option(void *packet, int option_type) {
+    struct iphdr *ip_hdr = (struct iphdr *)packet;
+    uint8_t *options = (uint8_t *)(packet + sizeof(struct iphdr));
+    int option_length = 0;
+
+    // IP timestamp option header
+    options[0] = 0x01; // Timestamp option type
+    options[1] = 0x01; // Length (will be adjusted below)
+    options[2] = option_type; // TSO: Timestamp only (1) or Timestamp + Address (2)
+    options[3] = 0x00; // Reserved
+
+    // Adjust option length and header fields
+    if (option_type == 1) { // tsonly
+        option_length = 8 + 4 * 9; // 8-byte header + 4 bytes per timestamp, up to 9 timestamps
+    } else if (option_type == 2) { // tsaddr
+        option_length = 8 + 8 * 4; // 8-byte header + 8 bytes per timestamp/address, up to 4 hops
+    }
+
+    options[1] = option_length; // Set the option length
+
+    // Initialize the timestamp field
+    memset(options + 4, 0, option_length - 4); // Fill with zeros
+
+    ip_hdr->ihl = (sizeof(struct iphdr) + option_length) / 4;
+    ip_hdr->tot_len = htons(ntohs(ip_hdr->tot_len) + option_length);
+}
+
 void packetCycle(ft_ping *ping){
     // Clear packet memory
     memset(ping->packet, 0, ping->packet_size + sizeof(struct icmphdr));
@@ -27,6 +55,38 @@ void packetCycle(ft_ping *ping){
 
     // // Copy ICMP header to packet
     // memcpy(ping->packet, icmp_hdr, sizeof(struct icmp));
+
+    struct iphdr *ip_hdr = (struct iphdr *)ping->packet;
+    ip_hdr->ihl = 5; // Header length
+    ip_hdr->version = 4; // IPv4
+    ip_hdr->tos = 0; // Type of service
+    ip_hdr->tot_len = sizeof(struct iphdr) + sizeof(struct icmphdr) + ping->packet_size;
+    ip_hdr->id = htons(getpid()); // ID
+    ip_hdr->frag_off = 0; // Fragment offset
+    ip_hdr->ttl = 64; // Time to live
+    ip_hdr->protocol = IPPROTO_ICMP; // Protocol
+    ip_hdr->check = 0; // Checksum
+    ip_hdr->saddr = 0; // Source address
+    ip_hdr->daddr = ping->dest_addr.sin_addr.s_addr; // Destination address
+
+    // Calculate checksum
+    ip_hdr->check = checksum((uint16_t *)ip_hdr, sizeof(struct iphdr));
+
+    // Copy IP header to packet
+
+    if (ping->parametersvalue & TokenType_TOS)
+    {
+        ip_hdr->tos = atoi(get_option_value(ping->arr, TokenType_TOS));
+    }
+
+
+    memcpy(ping->packet, ip_hdr, sizeof(struct iphdr));
+
+    if (ping->parametersvalue & TokenType_Ip_TimeStamp) {
+        const char *ts_option = get_option_value(ping->arr, TokenType_Ip_TimeStamp);
+        int option_type = (strcmp(ts_option, "tsonly") == 0) ? 1 : 2;
+        add_ip_timestamp_option(ping->packet, option_type);
+    }
 
     struct icmphdr *icmp_hdr = (struct icmphdr *)ping->packet;
     icmp_hdr->type = ICMP_ECHO;
@@ -88,10 +148,7 @@ void packetCycle(ft_ping *ping){
     }
 
     // Add timestamp to packet
-    if (ping->parametersvalue & TokenType_TimeStamp)
-    {
-        add_timestamp(ping->packet, sizeof(struct icmp) + (pattern == NULL ? 0 : strlen(pattern)));
-    }
+ 
 
     // Calculate checksum
     icmp_hdr->checksum = checksum((uint16_t *)ping->packet, ping->packet_size);

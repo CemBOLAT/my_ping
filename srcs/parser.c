@@ -7,7 +7,7 @@
 
 void init_options(Options *options){
     char *op[12] = {"-v", "-?", "-f", "-l", "-n", "-w", "-W", "-p", "-s", "-T", "-t", "--ip-timestamp"};
-    int values[12] = {0,    0,    0,    1,    0,    1,    1,    2,    1,    0,    4,           3};
+    int values[12] = {0,    0,    0,    1,    0,    1,    1,    2,    1,    1,    4,           3};
 
     for (int i = 0; i < 12; i++)
     {
