@@ -40,8 +40,7 @@ void packetCycle(ft_ping *ping){
         const char *packet_type = get_option_value(ping->arr, TokenType_SendPacketType);
         if (strcmp(packet_type, "address") == 0)
         {
-            icmp_hdr->type = ICMP_ADDRESS;
-
+            icmp_hdr->type = ICMP_ADDRESS; 
         
             uint32_t subnet_mask = htonl(0x00000000); // Replace with the appropriate mask
             memcpy(ping->packet + sizeof(struct icmphdr), &subnet_mask, sizeof(subnet_mask));
