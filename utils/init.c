@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <limits.h>
-#include <math.h>
 
+// Initialize options
 void init_options(Options *options){
     char *op[12] = {"-v", "-?", "-f", "-l", "-n", "-w", "-W", "-p", "-s", "-T", "-t", "--ip-timestamp"};
     int values[12] = {0,    0,    0,    1,    0,    1,    1,    2,    1,    1,    4,           3};
@@ -13,12 +13,12 @@ void init_options(Options *options){
     {
         options[i].option = op[i];
         options[i].value = values[i];
-        options[i].numericValue = pow(2, i);
+        options[i].numericValue = my_pow(2, i); // assign mask value
     }
 }
 
 void init_round_trip(ft_ping *ping){
-    my_memset(&ping->round_trip, 0, sizeof(RoundTrip));
+    my_memset(&ping->round_trip, 0, sizeof(RoundTrip)); // Initialize round_trip struct
     ping->round_trip.min = INT_MAX;
     ping->round_trip.avg = 0.0;
     ping->round_trip.max = INT_MIN;
@@ -31,8 +31,8 @@ void init_round_trip(ft_ping *ping){
 }
 
 void init_ping(ft_ping *ping){
-    ping->socket = -1;
-    ping->arr = createArray();
+    ping->socket = -1; // Initialize socket value
+    ping->arr = createArray(); // Initialize array
     ping->hosts = createStringArray();
     my_bzero(&ping->dest_addr, sizeof(struct sockaddr_in));
     my_bzero(&ping->options, sizeof(Options) * 12);

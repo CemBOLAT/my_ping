@@ -75,3 +75,21 @@ void my_strcat(char *dst, const char *src)
         *dst++ = *src++;
     *dst = '\0';
 }
+
+int my_pow(int base, int exp)
+{
+    int result = 1;
+    while (exp--)
+        result *= base;
+    return result;
+}
+
+int my_sqrt(int x)
+{
+    if (x == 0)
+        return 0;
+    int res = 1;
+    while (res * res <= x)
+        res++;
+    return res - 1;
+}

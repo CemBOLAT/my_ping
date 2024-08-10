@@ -9,7 +9,6 @@
 #include <netinet/ip.h> // iphdr tanımı için gerekli
 #include <netinet/in.h> // sockaddr_in tanımı için gerekli
 #include <limits.h>
-#include <math.h>
 #include <netinet/ip_icmp.h>
 
 void packetCycle(ft_ping *ping){
@@ -36,8 +35,7 @@ void packetCycle(ft_ping *ping){
     } 
 
     // Calculate checksum
-    icmp_hdr->checksum = checksum((uint16_t *)ping->packet, ping->packet_size);
-
+    icmp_hdr->checksum = checksum((uint16_t *)icmp_hdr, ping->packet_size);
     // Copy ICMP header to packet
 
     my_memcpy(ping->packet, icmp_hdr, sizeof(struct icmp));
@@ -46,7 +44,7 @@ void packetCycle(ft_ping *ping){
 void send_icmp_packet(ft_ping *ping)
 {
     packetCycle(ping);
-    gettimeofday(&ping->round_trip.sendTime, NULL);
+    gettimeofday(&ping->round_trip.sendTime, NULL);    
     if (sendto(ping->socket, ping->packet, ping->packet_size + sizeof(struct icmphdr), 0, (struct sockaddr *)&ping->dest_addr, sizeof(ping->dest_addr)) <= 0)
     {
         ERROR_MESSAGE("sendto");
@@ -66,7 +64,7 @@ void receive_icmp_packet(ft_ping *ping) {
     socklen_t addr_len = sizeof(recv_addr);
     int bytes_received = recvfrom(ping->socket, buffer, sizeof(buffer), 0, (struct sockaddr *)&recv_addr, &addr_len);
 
-    bool isFlooding = ping->parametersvalue & TokenType_Flood != 0;
+    bool isFlooding = (ping->parametersvalue & TokenType_Flood) != 0;
     
     if (bytes_received < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -80,10 +78,21 @@ void receive_icmp_packet(ft_ping *ping) {
         struct iphdr *ip_hdr = (struct iphdr *)buffer;
         int ip_header_len = ip_hdr->ihl * 4;
         struct icmphdr *icmp_hdr = (struct icmphdr *)(buffer + ip_header_len);
-        
+
+
+        uint16_t received_checksum = icmp_hdr->checksum;
+        icmp_hdr->checksum = 0;  // Kontrol için checksum alanını sıfırlayın
+        uint16_t calculated_checksum = checksum((uint16_t *)icmp_hdr, bytes_received - ip_header_len);
+
+        if (received_checksum != calculated_checksum) {
+            char output[1024];
+            sprintf(output, "checksum mismatch from %s", inet_ntoa(recv_addr.sin_addr));
+            ERROR_MESSAGE(output);
+            RESET;
+            my_bzero(output, sizeof(output));
+        }
         if (icmp_hdr->type == ICMP_ECHOREPLY && icmp_hdr->un.echo.id == getpid()) {
             gettimeofday(&ping->round_trip.recvTime, NULL);
-
 
             double send_time = ping->round_trip.sendTime.tv_sec + (double)ping->round_trip.sendTime.tv_usec / 1000000;
             double recv_time = ping->round_trip.recvTime.tv_sec + (double)ping->round_trip.recvTime.tv_usec / 1000000;

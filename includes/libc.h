@@ -13,3 +13,5 @@ void    my_memcpy(void *dst, const void *src, size_t n);
 int     my_atoi(const char *str);
 bool    my_isDigit(char c);
 void    my_strcat(char *dst, const char *src);
+int     my_pow(int base, int exp);
+int     my_sqrt(int x);

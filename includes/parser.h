@@ -66,7 +66,6 @@ typedef struct Token {
 
 #include "datas.h"
 
-bool        have_option(TokenArray *arr, TokenType type);
 TokenType   get_option(TokenArray *arr, TokenType type);
 const char  *get_option_value(TokenArray *arr, TokenType type);
 int         parse_options(int argc, char **argv, ft_ping *ping);

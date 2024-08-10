@@ -54,7 +54,7 @@ void packet_ip_header(ft_ping *ping)
 
     if (ping->parametersvalue & TokenType_TOS)
     {
-        ip_hdr->tos = my_atoi(get_option_value(ping->arr, TokenType_TOS));
+        ip_hdr->tos = my_atoi(get_option_value(ping->arr, TokenType_TOS)); // Type of service
     }
 
     my_memcpy(ping->packet, ip_hdr, sizeof(struct iphdr));
@@ -68,6 +68,8 @@ void packet_icmp_header(ft_ping *ping, struct icmphdr *icmp_hdr){
     icmp_hdr->un.echo.sequence = htons(ping->seq);
 
     packet_type(ping, icmp_hdr);
+
+    // Calculate checksum
 
     my_memcpy(ping->packet, icmp_hdr, sizeof(struct icmphdr));
 }

@@ -10,6 +10,7 @@
 #include <netinet/in.h> // sockaddr_in tanımı için gerekli
 #include <limits.h>
 
+// Fill the packet with the given pattern and length
 void fill_pattern(char *packet, const char *pattern, size_t length)
 {
     size_t pattern_length = my_strlen(pattern);
@@ -23,6 +24,7 @@ void init_dest_addr(ft_ping *ping)
 {
     // Initialize destination address
     ping->dest_addr.sin_family = AF_INET;
+    // Convert IP address to binary form and store it in dest_addr.sin_addr in network byte order
     if (inet_pton(AF_INET, ping->ip_str, &ping->dest_addr.sin_addr) != 1)
     {
         ERROR_MESSAGE("inet_pton");
@@ -35,7 +37,7 @@ void print_ping_banner(ft_ping *ping)
     int ping_ident = getpid() & 0xFFFF;
 
     char output[1024];
-
+    
     sprintf(output, "PING %s (%s)",
            ping->hosts->host[0],
            inet_ntoa(ping->dest_addr.sin_addr)
