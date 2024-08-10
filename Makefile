@@ -14,10 +14,12 @@ SRC := main.c \
 		./srcs/packet_header.c \
 		./utils/libc.c \
 
+Headers := ./includes/*.h
+
 
 OBJ := $(SRC:.c=.o)
 
-all: $(NAME)
+all: $(NAME) $(Headers)
 
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) -g -ggdb -lm

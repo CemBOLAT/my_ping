@@ -70,3 +70,14 @@ void print_ping_banner(ft_ping *ping)
     }
     printf("%s\n", output);
 }
+
+void preloadOption(ft_ping *ping)
+{
+    if (ping->parametersvalue & TokenType_Preload){
+        int preload = my_atoi(get_option_value(ping->arr, TokenType_Preload));
+        for (int i = 0; i < preload; i++){
+            send_icmp_packet(ping);
+            receive_icmp_packet(ping);
+        }
+    }
+}

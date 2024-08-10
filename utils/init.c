@@ -34,8 +34,8 @@ void init_ping(ft_ping *ping){
     ping->socket = -1;
     ping->arr = createArray();
     ping->hosts = createStringArray();
-    bzero(&ping->dest_addr, sizeof(struct sockaddr_in));
-    bzero(&ping->options, sizeof(Options) * 12);
+    my_bzero(&ping->dest_addr, sizeof(struct sockaddr_in));
+    my_bzero(&ping->options, sizeof(Options) * 12);
     ping->packet = NULL;
     ping->packet_size = 0;
     ping->seq = 0;
@@ -43,4 +43,28 @@ void init_ping(ft_ping *ping){
     ping->parametersvalue = 0;
     init_options(ping->options);
     init_round_trip(ping);
+}
+
+void init_icmp_packet(ft_ping *ping)
+{
+    // Parse packet size from options
+    ping->packet_size = ((ping->parametersvalue & TokenType_PacketSize) != 0) ? my_atoi(get_option_value(ping->arr, TokenType_PacketSize)) : DEFAULT_PACKET_SIZE;
+    
+    if (ping->packet_size > 65399)
+    {
+        char output[1024];
+        sprintf(output, "./ft_ping: option value too big: %d", ping->packet_size);
+        ERROR_MESSAGE(output);
+        ft_perfect_exit(ping);
+    }
+
+    // Allocate memory for packet
+    ping->packet = (char *)malloc(ping->packet_size + sizeof(struct icmphdr));
+    if (ping->packet == NULL)
+    {
+        ERROR_MESSAGE("malloc");
+        ft_perfect_exit(ping);
+    }
+
+    packetCycle(ping);
 }

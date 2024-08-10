@@ -16,31 +16,7 @@ void packetCycle(ft_ping *ping){
     // Clear packet memory
     my_memset(ping->packet, 0, ping->packet_size + sizeof(struct icmphdr));
 
-    struct iphdr *ip_hdr = (struct iphdr *)ping->packet;
-    ip_hdr->ihl = 5; // Header length
-    ip_hdr->version = 4; // IPv4
-    ip_hdr->tos = 0; // Type of service
-    ip_hdr->tot_len = sizeof(struct iphdr) + sizeof(struct icmphdr) + ping->packet_size;
-    ip_hdr->id = htons(getpid()); // ID
-    ip_hdr->frag_off = 0; // Fragment offset
-    ip_hdr->ttl = 64; // Time to live
-    ip_hdr->protocol = IPPROTO_ICMP; // Protocol
-    ip_hdr->check = 0; // Checksum
-    ip_hdr->saddr = 0; // Source address
-    ip_hdr->daddr = ping->dest_addr.sin_addr.s_addr; // Destination address
-
-    // Calculate checksum
-    ip_hdr->check = checksum((uint16_t *)ip_hdr, sizeof(struct iphdr));
-
-    // Copy IP header to packet
-
-    if (ping->parametersvalue & TokenType_TOS)
-    {
-        ip_hdr->tos = my_atoi(get_option_value(ping->arr, TokenType_TOS));
-    }
-
-
-    my_memcpy(ping->packet, ip_hdr, sizeof(struct iphdr));
+    packet_ip_header(ping);
 
     if (ping->parametersvalue & TokenType_Ip_TimeStamp) {
         const char *ts_option = get_option_value(ping->arr, TokenType_Ip_TimeStamp);
@@ -49,55 +25,7 @@ void packetCycle(ft_ping *ping){
     }
 
     struct icmphdr *icmp_hdr = (struct icmphdr *)ping->packet;
-    icmp_hdr->type = ICMP_ECHO;
-    icmp_hdr->code = 0;
-    icmp_hdr->checksum = 0;
-    icmp_hdr->un.echo.id = getpid();
-    icmp_hdr->un.echo.sequence = htons(ping->seq);
-
-    if (ping->parametersvalue & TokenType_SendPacketType)
-    {
-        const char *packet_type = get_option_value(ping->arr, TokenType_SendPacketType);
-        if (my_strcmp(packet_type, "address") == 0)
-        {
-            icmp_hdr->type = ICMP_ADDRESS; 
-        
-            uint32_t subnet_mask = htonl(0x00000000); // Replace with the appropriate mask
-            my_memcpy(ping->packet + sizeof(struct icmphdr), &subnet_mask, sizeof(subnet_mask));
-
-        }
-        else if (my_strcmp(packet_type, "mask") == 0)
-        {
-            icmp_hdr->type = ICMP_MASKREQ;
-
-            // IP mask option
-
-            uint32_t subnet_mask = htonl(0x00000000); // Replace with the appropriate mask
-            my_memcpy(ping->packet + sizeof(struct icmphdr), &subnet_mask, sizeof(subnet_mask));
-        }
-        else if (my_strcmp(packet_type, "timestamp") == 0)
-        {
-            icmp_hdr->type = ICMP_TIMESTAMP;
-            struct timeval tv;
-            gettimeofday(&tv, NULL);
-            
-            uint32_t originate_timestamp = htonl(tv.tv_sec * 1000 + tv.tv_usec / 1000); // Convert to milliseconds
-
-            // IP timestamp option
-            unsigned char ip_opts[12];
-            ip_opts[0] = IPOPT_TIMESTAMP;
-            ip_opts[1] = 10; // length of the option
-            ip_opts[2] = 5;  // pointer to the next free byte
-            ip_opts[3] = IPOPT_TS_TSONLY;
-            
-            my_memcpy(&ip_opts[4], &originate_timestamp, sizeof(originate_timestamp));
-
-            // Copy IP options into packet after ICMP header
-            my_memcpy(ping->packet + sizeof(struct icmphdr), ip_opts, sizeof(ip_opts));
-        }
-    }
-
-    my_memcpy(ping->packet, icmp_hdr, sizeof(struct icmphdr));
+    packet_icmp_header(ping, icmp_hdr);
 
     // Add pattern to packet if specified
     const char *pattern = NULL;
@@ -105,10 +33,7 @@ void packetCycle(ft_ping *ping){
     {
         pattern = get_option_value(ping->arr, TokenType_Pattern);
         fill_pattern(ping->packet + sizeof(struct icmp) + sizeof(struct timeval), pattern, ping->packet_size - sizeof(struct icmp) - sizeof(struct timeval));
-    }
-
-    // Add timestamp to packet
- 
+    } 
 
     // Calculate checksum
     icmp_hdr->checksum = checksum((uint16_t *)ping->packet, ping->packet_size);
@@ -182,42 +107,7 @@ void receive_icmp_packet(ft_ping *ping) {
             sprintf(output, "Cannot handle ICMP packet with type %d", icmp_hdr->type);
             ERROR_MESSAGE(output);
             RESET;
-            bzero(output, sizeof(output));
-        }
-    }
-}
-
-void init_icmp_packet(ft_ping *ping)
-{
-    // Parse packet size from options
-    ping->packet_size = ping->parametersvalue & TokenType_PacketSize != 0 ? my_atoi(get_option_value(ping->arr, TokenType_PacketSize)) : DEFAULT_PACKET_SIZE;
-    
-    if (ping->packet_size > 65399)
-    {
-        char output[1024];
-        sprintf(output, "./ft_ping: option value too big: %d", ping->packet_size);
-        ERROR_MESSAGE(output);
-        ft_perfect_exit(ping);
-    }
-
-    // Allocate memory for packet
-    ping->packet = (char *)malloc(ping->packet_size + sizeof(struct icmphdr));
-    if (ping->packet == NULL)
-    {
-        ERROR_MESSAGE("malloc");
-        ft_perfect_exit(ping);
-    }
-
-    packetCycle(ping);
-}
-
-void preloadOption(ft_ping *ping)
-{
-    if (ping->parametersvalue & TokenType_Preload){
-        int preload = my_atoi(get_option_value(ping->arr, TokenType_Preload));
-        for (int i = 0; i < preload; i++){
-            send_icmp_packet(ping);
-            receive_icmp_packet(ping);
+            my_bzero(output, sizeof(output));
         }
     }
 }
