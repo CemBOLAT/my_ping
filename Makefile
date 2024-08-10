@@ -8,9 +8,10 @@ SRC := main.c \
 		./srcs/ping.c \
 		./srcs/socket.c \
 		./utils/tokenize_utils.c \
-		./utils/packetUtils.c \
-		./utils/packet_calc.c \
+		./srcs/packetUtils.c \
+		./srcs/packet_calc.c \
 		./utils/init.c \
+		./srcs/packet_header.c \
 		./utils/libc.c \
 
 

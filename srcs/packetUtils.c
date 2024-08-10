@@ -46,11 +46,11 @@ void print_ping_banner(ft_ping *ping)
         const char *value = get_option_value(ping->arr, TokenType_SendPacketType);
         if (my_strcmp(value, "timestamp") == 0)
         {
-            strcat(output, " sending timestamp requests"); // PING google.com (172.217.169.110) 56 data bytes sending timestamp requests
+            my_strcat(output, " sending timestamp requests"); // PING google.com (172.217.169.110) 56 data bytes sending timestamp requests
         }
         else if (my_strcmp(value, "address") == 0 || my_strcmp(value, "mask") == 0)
         {
-            strcat(output, " sending address mask requests");
+            my_strcat(output, " sending address mask requests");
         }
     }
     else if (ping->parametersvalue & TokenType_Verbose)

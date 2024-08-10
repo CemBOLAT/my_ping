@@ -9,6 +9,8 @@
 #include <netinet/in.h> // sockaddr_in tanımı için gerekli
 #include <netdb.h> // addrinfo , getaddrinfo() , freeaddrinfo()
 
+#include "superArray.h"
+
 typedef struct s_round_trip {
     double min;
     double max;

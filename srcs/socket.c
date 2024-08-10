@@ -10,12 +10,9 @@ void init_socket(ft_ping *ping){
         ERROR_MESSAGE("socket");
         ft_perfect_exit(ping);
     }
-    // init dest_addr
-    init_dest_addr(ping);
-    
-    // TIME TO LIVE
 
-    // RECEIVE TIMEOUT
+    init_dest_addr(ping);
+        
     struct timeval timeout;
     timeout.tv_sec = DEFAULT_TIMEOUT;
     timeout.tv_usec = 0;
@@ -25,6 +22,4 @@ void init_socket(ft_ping *ping){
         ERROR_MESSAGE("setsockopt");
         ft_perfect_exit(ping);
     }
-    // SEND TIMEOUT
-
 }

@@ -66,3 +66,12 @@ bool my_isDigit(char c)
 {
     return (c >= '0' && c <= '9');
 }
+
+void my_strcat(char *dst, const char *src)
+{
+    while (*dst)
+        dst++;
+    while (*src)
+        *dst++ = *src++;
+    *dst = '\0';
+}

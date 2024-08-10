@@ -12,3 +12,4 @@ size_t  my_strlen(const char *s);
 void    my_memcpy(void *dst, const void *src, size_t n);
 int     my_atoi(const char *str);
 bool    my_isDigit(char c);
+void    my_strcat(char *dst, const char *src);
