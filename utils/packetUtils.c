@@ -65,22 +65,42 @@ void init_dest_addr(ft_ping *ping)
 void print_ping_banner(ft_ping *ping)
 {
     int ping_ident = getpid() & 0xFFFF;
-    if (ping->parametersvalue & TokenType_Verbose)
+
+    char output[1024];
+
+    sprintf(output, "PING %s (%s)",
+           ping->hosts->host[0],
+           inet_ntoa(ping->dest_addr.sin_addr)
+    );
+
+    if (ping->parametersvalue & TokenType_SendPacketType)
     {
-        printf("PING %s (%s) %d data bytes, id 0x%04x = %u\n",
-            ping->hosts->host[0],
-            inet_ntoa(ping->dest_addr.sin_addr),
-            ping->packet_size, // dent & 0xFFFF
-            htons(ping_ident), // htons(ping_ident)
-            htons(ping_ident));
+        const char *value = get_option_value(ping->arr, TokenType_SendPacketType);
+        if (strcmp(value, "timestamp") == 0)
+        {
+            strcat(output, " sending timestamp requests"); // PING google.com (172.217.169.110) 56 data bytes sending timestamp requests
+        }
+        else if (strcmp(value, "address") == 0 || strcmp(value, "mask") == 0)
+        {
+            strcat(output, " sending address mask requests");
+        }
+    }
+    else if (ping->parametersvalue & TokenType_Verbose)
+    {
+
+        sprintf(output, "%s %d data bytes, id 0x%04x = %u",
+                ping->packet_size,
+                output,
+                htons(ping_ident),
+                htons(ping_ident));
     }
     else
     {
-        printf("PING %s (%s) %d data bytes\n",
-           ping->hosts->host[0],
-           inet_ntoa(ping->dest_addr.sin_addr),
-           ping->packet_size);
+        sprintf(output, "%s %d data bytes",
+                output,
+                ping->packet_size);
     }
+    printf("%s\n", output);
 }
 
 void update_statistics(ft_ping *ping, double rtt)

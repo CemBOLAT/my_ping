@@ -35,6 +35,49 @@ void packetCycle(ft_ping *ping){
     icmp_hdr->un.echo.id = getpid();
     icmp_hdr->un.echo.sequence = htons(ping->seq);
 
+    if (ping->parametersvalue & TokenType_SendPacketType)
+    {
+        const char *packet_type = get_option_value(ping->arr, TokenType_SendPacketType);
+        if (strcmp(packet_type, "address") == 0)
+        {
+            icmp_hdr->type = ICMP_ADDRESS;
+
+        
+            uint32_t subnet_mask = htonl(0x00000000); // Replace with the appropriate mask
+            memcpy(ping->packet + sizeof(struct icmphdr), &subnet_mask, sizeof(subnet_mask));
+
+        }
+        else if (strcmp(packet_type, "mask") == 0)
+        {
+            icmp_hdr->type = ICMP_MASKREQ;
+
+            // IP mask option
+
+            uint32_t subnet_mask = htonl(0x00000000); // Replace with the appropriate mask
+            memcpy(ping->packet + sizeof(struct icmphdr), &subnet_mask, sizeof(subnet_mask));
+        }
+        else if (strcmp(packet_type, "timestamp") == 0)
+        {
+            icmp_hdr->type = ICMP_TIMESTAMP;
+            struct timeval tv;
+            gettimeofday(&tv, NULL);
+            
+            uint32_t originate_timestamp = htonl(tv.tv_sec * 1000 + tv.tv_usec / 1000); // Convert to milliseconds
+
+            // IP timestamp option
+            unsigned char ip_opts[12];
+            ip_opts[0] = IPOPT_TIMESTAMP;
+            ip_opts[1] = 10; // length of the option
+            ip_opts[2] = 5;  // pointer to the next free byte
+            ip_opts[3] = IPOPT_TS_TSONLY;
+            
+            memcpy(&ip_opts[4], &originate_timestamp, sizeof(originate_timestamp));
+
+            // Copy IP options into packet after ICMP header
+            memcpy(ping->packet + sizeof(struct icmphdr), ip_opts, sizeof(ip_opts));
+        }
+    }
+
     memcpy(ping->packet, icmp_hdr, sizeof(struct icmphdr));
 
     // Add pattern to packet if specified
@@ -82,7 +125,7 @@ void receive_icmp_packet(ft_ping *ping) {
     socklen_t addr_len = sizeof(recv_addr);
     int bytes_received = recvfrom(ping->socket, buffer, sizeof(buffer), 0, (struct sockaddr *)&recv_addr, &addr_len);
 
-    bool isFlooding = ping->parametersvalue & TokenType_Flood;
+    bool isFlooding = ping->parametersvalue & TokenType_Flood != 0;
     
     if (bytes_received < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -131,7 +174,7 @@ void receive_icmp_packet(ft_ping *ping) {
 void init_icmp_packet(ft_ping *ping)
 {
     // Parse packet size from options
-    ping->packet_size = ping->parametersvalue & TokenType_PacketSize ? atoi(get_option_value(ping->arr, TokenType_PacketSize)) : DEFAULT_PACKET_SIZE;
+    ping->packet_size = ping->parametersvalue & TokenType_PacketSize != 0 ? atoi(get_option_value(ping->arr, TokenType_PacketSize)) : DEFAULT_PACKET_SIZE;
     
     if (ping->packet_size > 65399)
     {
@@ -189,18 +232,18 @@ void execute_ping(ft_ping *ping){
     preloadOption(ping);
 
     struct timeval end;
-    size_t deadlineValue = ping->parametersvalue & TokenType_Deadline ? atoi(get_option_value(ping->arr, TokenType_Deadline)) : DEFAULT_DEADLINE;
-    size_t timeoutValue = ping->parametersvalue & TokenType_Timeout ? atoi(get_option_value(ping->arr, TokenType_Timeout)) : DEFAULT_TIMEOUT;
+    size_t deadlineValue = ((ping->parametersvalue & TokenType_Deadline) != 0) ? atoi(get_option_value(ping->arr, TokenType_Deadline)) : INT_MAX;
+    size_t timeoutValue = ((ping->parametersvalue & TokenType_Timeout) != 0) ? atoi(get_option_value(ping->arr, TokenType_Timeout)) : INT_MAX;
 
     while (1)
     {
+        send_icmp_packet(ping);
         if (ping->parametersvalue & TokenType_Deadline){
             gettimeofday(&end, NULL);
             if (end.tv_sec - ping->round_trip.time.tv_sec >= deadlineValue){
                 signal_exit(SIGINT);
             }
         }
-        send_icmp_packet(ping);
         if (ping->parametersvalue & TokenType_Timeout){
             while (1){
                 gettimeofday(&end, NULL);

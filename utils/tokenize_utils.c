@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
+#include <math.h>
 
 bool have_option(TokenArray *arr, TokenType type){
     for (int i = 0; i < arr->size; i++)
@@ -28,7 +29,7 @@ TokenType get_option(TokenArray *arr, TokenType type){
 const char *get_option_value(TokenArray *arr, TokenType type){
     for (int i = 0; i < arr->size; i++)
     {
-        if (arr->tokens[i].type == type)
+        if (pow(2, arr->tokens[i].type) == type)
         {
             return arr->tokens[i].value;
         }
@@ -37,6 +38,10 @@ const char *get_option_value(TokenArray *arr, TokenType type){
 }
 
 bool isNumber(char *str){
+    if (str[0] == '-')
+    {
+        str++;
+    }
     for (int i = 0; str[i] != '\0'; i++)
     {
         if (!isdigit(str[i]))
