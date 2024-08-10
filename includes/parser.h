@@ -61,5 +61,4 @@ When you use --ip-timestamp=tsaddr, the IP packets will include a timestamp opti
 typedef struct Token {
     TokenType type;
     char* value; // -l 10 -> value = 10 for -v value = NULL
-    void *function; // -v -> function = verbose
 }Token;

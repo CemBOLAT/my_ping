@@ -146,7 +146,7 @@ void removeStringArrayValue(HostArray *arr, char *str){
         exit(1); // sonrasında benim free fonksiyonumla değiştirilecek
     }
     for (int i = 0; i < arr->size; i++){
-        if (strcmp(arr->host[i], str) == 0){
+        if (my_strcmp(arr->host[i], str) == 0){
             removeStringArrayIndex(&arr, i);
             return;
         }

@@ -44,7 +44,7 @@ bool isNumber(char *str){
     }
     for (int i = 0; str[i] != '\0'; i++)
     {
-        if (!isdigit(str[i]))
+        if (!my_isDigit(str[i]))
         {
             return false;
         }
@@ -64,7 +64,7 @@ bool is_ipv4(char *str, ft_ping *ping){
             each_dot_part = 0;
             nbr_of_dots++;
         }
-        else if (!isdigit(str[i])){
+        else if (!my_isDigit(str[i])){
             return false;
         }
         else{
@@ -74,7 +74,7 @@ bool is_ipv4(char *str, ft_ping *ping){
     if (each_dot_part > 255 || nbr_of_dots != 3){
         return false;
     }
-    memcpy(ping->ip_str, str, strlen(str) + 1);
+    my_memcpy(ping->ip_str, str, my_strlen(str) + 1);
     return true;
 }
 
@@ -83,7 +83,7 @@ bool is_fdqn(char *str, ft_ping *ping)
     struct addrinfo hints, *res;
     int status;
     
-    memset(&hints, 0, sizeof hints);
+    my_memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET;  // Sadece IPv4
     hints.ai_socktype = SOCK_STREAM;  // TCP bağlantı
 

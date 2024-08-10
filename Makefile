@@ -9,6 +9,9 @@ SRC := main.c \
 		./srcs/socket.c \
 		./utils/tokenize_utils.c \
 		./utils/packetUtils.c \
+		./utils/packet_calc.c \
+		./utils/init.c \
+		./utils/libc.c \
 
 
 OBJ := $(SRC:.c=.o)

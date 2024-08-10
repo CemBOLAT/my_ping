@@ -34,7 +34,7 @@ void add_ip_timestamp_option(void *packet, int option_type) {
     options[1] = option_length; // Set the option length
 
     // Initialize the timestamp field
-    memset(options + 4, 0, option_length - 4); // Fill with zeros
+    my_memset(options + 4, 0, option_length - 4); // Fill with zeros
 
     ip_hdr->ihl = (sizeof(struct iphdr) + option_length) / 4;
     ip_hdr->tot_len = htons(ntohs(ip_hdr->tot_len) + option_length);
@@ -42,19 +42,7 @@ void add_ip_timestamp_option(void *packet, int option_type) {
 
 void packetCycle(ft_ping *ping){
     // Clear packet memory
-    memset(ping->packet, 0, ping->packet_size + sizeof(struct icmphdr));
-
-    // Initialize ICMP header
-
-    // struct icmp *icmp_hdr = (struct icmp *)ping->packet;
-    // icmp_hdr->icmp_type = ICMP_ECHO;
-    // icmp_hdr->icmp_code = 0;
-    // icmp_hdr->icmp_id = getpid();
-    // icmp_hdr->icmp_seq = ping->seq++;
-    // icmp_hdr->icmp_cksum = 0;
-
-    // // Copy ICMP header to packet
-    // memcpy(ping->packet, icmp_hdr, sizeof(struct icmp));
+    my_memset(ping->packet, 0, ping->packet_size + sizeof(struct icmphdr));
 
     struct iphdr *ip_hdr = (struct iphdr *)ping->packet;
     ip_hdr->ihl = 5; // Header length
@@ -76,15 +64,15 @@ void packetCycle(ft_ping *ping){
 
     if (ping->parametersvalue & TokenType_TOS)
     {
-        ip_hdr->tos = atoi(get_option_value(ping->arr, TokenType_TOS));
+        ip_hdr->tos = my_atoi(get_option_value(ping->arr, TokenType_TOS));
     }
 
 
-    memcpy(ping->packet, ip_hdr, sizeof(struct iphdr));
+    my_memcpy(ping->packet, ip_hdr, sizeof(struct iphdr));
 
     if (ping->parametersvalue & TokenType_Ip_TimeStamp) {
         const char *ts_option = get_option_value(ping->arr, TokenType_Ip_TimeStamp);
-        int option_type = (strcmp(ts_option, "tsonly") == 0) ? 1 : 2;
+        int option_type = (my_strcmp(ts_option, "tsonly") == 0) ? 1 : 2;
         add_ip_timestamp_option(ping->packet, option_type);
     }
 
@@ -98,24 +86,24 @@ void packetCycle(ft_ping *ping){
     if (ping->parametersvalue & TokenType_SendPacketType)
     {
         const char *packet_type = get_option_value(ping->arr, TokenType_SendPacketType);
-        if (strcmp(packet_type, "address") == 0)
+        if (my_strcmp(packet_type, "address") == 0)
         {
             icmp_hdr->type = ICMP_ADDRESS; 
         
             uint32_t subnet_mask = htonl(0x00000000); // Replace with the appropriate mask
-            memcpy(ping->packet + sizeof(struct icmphdr), &subnet_mask, sizeof(subnet_mask));
+            my_memcpy(ping->packet + sizeof(struct icmphdr), &subnet_mask, sizeof(subnet_mask));
 
         }
-        else if (strcmp(packet_type, "mask") == 0)
+        else if (my_strcmp(packet_type, "mask") == 0)
         {
             icmp_hdr->type = ICMP_MASKREQ;
 
             // IP mask option
 
             uint32_t subnet_mask = htonl(0x00000000); // Replace with the appropriate mask
-            memcpy(ping->packet + sizeof(struct icmphdr), &subnet_mask, sizeof(subnet_mask));
+            my_memcpy(ping->packet + sizeof(struct icmphdr), &subnet_mask, sizeof(subnet_mask));
         }
-        else if (strcmp(packet_type, "timestamp") == 0)
+        else if (my_strcmp(packet_type, "timestamp") == 0)
         {
             icmp_hdr->type = ICMP_TIMESTAMP;
             struct timeval tv;
@@ -130,14 +118,14 @@ void packetCycle(ft_ping *ping){
             ip_opts[2] = 5;  // pointer to the next free byte
             ip_opts[3] = IPOPT_TS_TSONLY;
             
-            memcpy(&ip_opts[4], &originate_timestamp, sizeof(originate_timestamp));
+            my_memcpy(&ip_opts[4], &originate_timestamp, sizeof(originate_timestamp));
 
             // Copy IP options into packet after ICMP header
-            memcpy(ping->packet + sizeof(struct icmphdr), ip_opts, sizeof(ip_opts));
+            my_memcpy(ping->packet + sizeof(struct icmphdr), ip_opts, sizeof(ip_opts));
         }
     }
 
-    memcpy(ping->packet, icmp_hdr, sizeof(struct icmphdr));
+    my_memcpy(ping->packet, icmp_hdr, sizeof(struct icmphdr));
 
     // Add pattern to packet if specified
     const char *pattern = NULL;
@@ -155,7 +143,7 @@ void packetCycle(ft_ping *ping){
 
     // Copy ICMP header to packet
 
-    memcpy(ping->packet, icmp_hdr, sizeof(struct icmp));
+    my_memcpy(ping->packet, icmp_hdr, sizeof(struct icmp));
 }
 
 void send_icmp_packet(ft_ping *ping)
@@ -230,7 +218,7 @@ void receive_icmp_packet(ft_ping *ping) {
 void init_icmp_packet(ft_ping *ping)
 {
     // Parse packet size from options
-    ping->packet_size = ping->parametersvalue & TokenType_PacketSize != 0 ? atoi(get_option_value(ping->arr, TokenType_PacketSize)) : DEFAULT_PACKET_SIZE;
+    ping->packet_size = ping->parametersvalue & TokenType_PacketSize != 0 ? my_atoi(get_option_value(ping->arr, TokenType_PacketSize)) : DEFAULT_PACKET_SIZE;
     
     if (ping->packet_size > 65399)
     {
@@ -254,7 +242,7 @@ void init_icmp_packet(ft_ping *ping)
 void preloadOption(ft_ping *ping)
 {
     if (ping->parametersvalue & TokenType_Preload){
-        int preload = atoi(get_option_value(ping->arr, TokenType_Preload));
+        int preload = my_atoi(get_option_value(ping->arr, TokenType_Preload));
         for (int i = 0; i < preload; i++){
             send_icmp_packet(ping);
             receive_icmp_packet(ping);
@@ -288,8 +276,8 @@ void execute_ping(ft_ping *ping){
     preloadOption(ping);
 
     struct timeval end;
-    size_t deadlineValue = ((ping->parametersvalue & TokenType_Deadline) != 0) ? atoi(get_option_value(ping->arr, TokenType_Deadline)) : INT_MAX;
-    size_t timeoutValue = ((ping->parametersvalue & TokenType_Timeout) != 0) ? atoi(get_option_value(ping->arr, TokenType_Timeout)) : INT_MAX;
+    size_t deadlineValue = ((ping->parametersvalue & TokenType_Deadline) != 0) ? my_atoi(get_option_value(ping->arr, TokenType_Deadline)) : INT_MAX;
+    size_t timeoutValue = ((ping->parametersvalue & TokenType_Timeout) != 0) ? my_atoi(get_option_value(ping->arr, TokenType_Timeout)) : INT_MAX;
 
     while (1)
     {
