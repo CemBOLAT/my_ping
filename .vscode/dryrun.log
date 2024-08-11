@@ -4,9 +4,16 @@ cc  -c main.c -o main.o
 cc  -c srcs/parser.c -o srcs/parser.o
 cc  -c utils/superArray.c -o utils/superArray.o
 cc  -c utils/perfectExit.c -o utils/perfectExit.o
+ 
 cc  -c srcs/ping.c -o srcs/ping.o
 cc  -c srcs/socket.c -o srcs/socket.o
 cc  -c utils/tokenize_utils.c -o utils/tokenize_utils.o
-cc  -o ft_ping main.o ./srcs/parser.o ./utils/superArray.o ./utils/perfectExit.o ./srcs/ping.o ./srcs/socket.o ./utils/tokenize_utils.o
+cc  -c srcs/packetUtils.c -o srcs/packetUtils.o
+cc  -c srcs/packet_calc.c -o srcs/packet_calc.o
+cc  -c utils/init.c -o utils/init.o
+ 
+cc  -c srcs/packet_header.c -o srcs/packet_header.o
+cc  -c utils/libc.c -o utils/libc.o
+cc  -o ft_ping main.o ./srcs/parser.o ./utils/superArray.o ./utils/perfectExit.o ./srcs/ping.o ./srcs/socket.o ./utils/tokenize_utils.o ./srcs/packetUtils.o ./srcs/packet_calc.o ./utils/init.o ./srcs/packet_header.o ./utils/libc.o -g -ggdb -lm
 make: Leaving directory `/Users/cembolat/Desktop/ft_ping'
  

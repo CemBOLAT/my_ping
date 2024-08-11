@@ -7,7 +7,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 
 # This program built for i386-apple-darwin11.3.0
 
-# Make data base, printed on Mon Aug  5 16:42:51 2024
+# Make data base, printed on Sun Aug 11 16:05:28 2024
 
 # Variables
 
@@ -15,12 +15,12 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 <D = $(patsubst %/,%,$(dir $<))
 # automatic
 ?F = $(notdir $?)
-# makefile (from `Makefile', line 12)
-OBJ := main.o ./srcs/parser.o ./utils/superArray.o ./utils/perfectExit.o ./srcs/ping.o ./srcs/socket.o ./utils/tokenize_utils.o
+# makefile (from `Makefile', line 20)
+OBJ := main.o ./srcs/parser.o ./utils/superArray.o ./utils/perfectExit.o ./srcs/ping.o ./srcs/socket.o ./utils/tokenize_utils.o ./srcs/packetUtils.o ./srcs/packet_calc.o ./utils/init.o ./srcs/packet_header.o ./utils/libc.o
 # environment
 VSCODE_CRASH_REPORTER_PROCESS_TYPE = extensionHost
 # makefile (from `Makefile', line 4)
-SRC := main.c ./srcs/parser.c ./utils/superArray.c ./utils/perfectExit.c ./srcs/ping.c ./srcs/socket.c ./utils/tokenize_utils.c 
+SRC := main.c ./srcs/parser.c ./utils/superArray.c ./utils/perfectExit.c ./srcs/ping.c ./srcs/socket.c ./utils/tokenize_utils.c ./srcs/packetUtils.c ./srcs/packet_calc.c ./utils/init.c ./srcs/packet_header.c ./utils/libc.c 
 # automatic
 ?D = $(patsubst %/,%,$(dir $?))
 # automatic
@@ -32,7 +32,7 @@ CURDIR := /Users/cembolat/Desktop/ft_ping
 # makefile
 SHELL = /bin/sh
 # environment
-VSCODE_NLS_CONFIG = {"userLocale":"tr","osLocale":"tr-tr","resolvedLanguage":"tr","defaultMessagesFile":"/Applications/Visual Studio Code.app/Contents/Resources/app/out/nls.messages.json","languagePack":{"translationsConfigFile":"/Users/cembolat/Library/Application Support/Code/clp/49fb877bfe944c9ddc2fbf946259d5ad.tr/tcf.json","messagesFile":"/Users/cembolat/Library/Application Support/Code/clp/49fb877bfe944c9ddc2fbf946259d5ad.tr/b1c0a14de1414fcdaa400695b4db1c0799bc3124/nls.messages.json","corruptMarkerFile":"/Users/cembolat/Library/Application Support/Code/clp/49fb877bfe944c9ddc2fbf946259d5ad.tr/corrupted.info"},"locale":"tr","availableLanguages":{"*":"tr"},"_languagePackId":"49fb877bfe944c9ddc2fbf946259d5ad.tr","_languagePackSupport":true,"_translationsConfigFile":"/Users/cembolat/Library/Application Support/Code/clp/49fb877bfe944c9ddc2fbf946259d5ad.tr/tcf.json","_cacheRoot":"/Users/cembolat/Library/Application Support/Code/clp/49fb877bfe944c9ddc2fbf946259d5ad.tr","_resolvedLanguagePackCoreLocation":"/Users/cembolat/Library/Application Support/Code/clp/49fb877bfe944c9ddc2fbf946259d5ad.tr/b1c0a14de1414fcdaa400695b4db1c0799bc3124","_corruptedFile":"/Users/cembolat/Library/Application Support/Code/clp/49fb877bfe944c9ddc2fbf946259d5ad.tr/corrupted.info"}
+VSCODE_NLS_CONFIG = {"userLocale":"tr","osLocale":"tr-tr","resolvedLanguage":"tr","defaultMessagesFile":"/Applications/Visual Studio Code.app/Contents/Resources/app/out/nls.messages.json","languagePack":{"translationsConfigFile":"/Users/cembolat/Library/Application Support/Code/clp/80aef5c6e3704c790002fddbdec47651.tr/tcf.json","messagesFile":"/Users/cembolat/Library/Application Support/Code/clp/80aef5c6e3704c790002fddbdec47651.tr/eaa41d57266683296de7d118f574d0c2652e1fc4/nls.messages.json","corruptMarkerFile":"/Users/cembolat/Library/Application Support/Code/clp/80aef5c6e3704c790002fddbdec47651.tr/corrupted.info"},"locale":"tr","availableLanguages":{"*":"tr"},"_languagePackId":"80aef5c6e3704c790002fddbdec47651.tr","_languagePackSupport":true,"_translationsConfigFile":"/Users/cembolat/Library/Application Support/Code/clp/80aef5c6e3704c790002fddbdec47651.tr/tcf.json","_cacheRoot":"/Users/cembolat/Library/Application Support/Code/clp/80aef5c6e3704c790002fddbdec47651.tr","_resolvedLanguagePackCoreLocation":"/Users/cembolat/Library/Application Support/Code/clp/80aef5c6e3704c790002fddbdec47651.tr/eaa41d57266683296de7d118f574d0c2652e1fc4","_corruptedFile":"/Users/cembolat/Library/Application Support/Code/clp/80aef5c6e3704c790002fddbdec47651.tr/corrupted.info"}
 # environment
 _ = /usr/bin/make
 # makefile (from `Makefile', line 1)
@@ -67,10 +67,12 @@ MANPATH = /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/share/man:/Lib
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
 HOME = /Users/cembolat
+# makefile (from `Makefile', line 17)
+Headers := ./includes/*.h
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/cembolat/Library/Application Support/Code/CachedData/b1c0a14de1414fcdaa400695b4db1c0799bc3124
+VSCODE_CODE_CACHE_PATH = /Users/cembolat/Library/Application Support/Code/CachedData/eaa41d57266683296de7d118f574d0c2652e1fc4
 # environment
 LOGNAME = cembolat
 # environment
@@ -116,7 +118,7 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.28835221.28835227
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.29096941.29096948
 # environment
 HOMEBREW_PREFIX = /opt/homebrew
 # automatic
@@ -148,9 +150,9 @@ CLICOLOR = 1
 # environment
 LANG = C
 # environment
-VSCODE_PID = 2320
+VSCODE_PID = 86122
 # variable set hash-table stats:
-# Load=69/1024=7%, Rehash=0, Collisions=3/101=3%
+# Load=70/1024=7%, Rehash=0, Collisions=3/103=3%
 
 # Pattern-specific Variable Values
 
@@ -158,16 +160,15 @@ VSCODE_PID = 2320
 
 # Directories
 
-# utils (device 16777232, inode 28549999): 7 files, no impossibilities so far.
-# . (device 16777232, inode 28549760): 18 files, no impossibilities.
-# srcs (device 16777232, inode 28549992): 6 files, no impossibilities so far.
+# . (device 16777232, inode 29219060): 12 files, no impossibilities.
+# includes (device 16777232, inode 29219176): 10 files, no impossibilities.
 
-# 31 files, no impossibilities in 3 directories.
+# 22 files, no impossibilities in 2 directories.
 
 # Implicit Rules
 
 %.o: %.c
-#  commands to execute (from `Makefile', line 21):
+#  commands to execute (from `Makefile', line 28):
 	$(CC) $(CFLAGS) -c $< -o $@
 	
 
@@ -175,44 +176,25 @@ VSCODE_PID = 2320
 
 # Files
 
-srcs/ping.o: srcs/ping.c
-#  Implicit rule search has been done.
-#  Implicit/static pattern stem: `srcs/ping'
-#  File does not exist.
-#  File has been updated.
-#  Needs to be updated (-q is set).
-# automatic
-# @ := srcs/ping.o
-# automatic
-# % := 
-# automatic
-# * := srcs/ping
-# automatic
-# + := srcs/ping.c
-# automatic
-# | := 
-# automatic
-# < := srcs/ping.c
-# automatic
-# ^ := srcs/ping.c
-# automatic
-# ? := srcs/ping.c
-# variable set hash-table stats:
-# Load=8/32=25%, Rehash=0, Collisions=1/14=7%
-#  commands to execute (from `Makefile', line 21):
-	$(CC) $(CFLAGS) -c $< -o $@
-	
+# Not a target:
+includes/datas.h:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # Not a target:
-srcs/parser.c:
-#  Implicit rule search has been done.
-#  Last modified 2024-07-30 23:22:39
-#  File has been updated.
-#  Successfully updated.
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+srcs/ping.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
-all: ft_ping
+# Not a target:
+includes/parser.h:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+all: ft_ping includes/calc.h includes/datas.h includes/init.h includes/libc.h includes/parser.h includes/ping.h includes/superArray.h includes/text_engine.h
 #  Phony target (prerequisite of .PHONY).
 #  Command-line target.
 #  Implicit rule search has not been done.
@@ -230,32 +212,29 @@ all: ft_ping
 # Not a target:
 main.c:
 #  Implicit rule search has been done.
-#  Last modified 2024-07-30 18:52:09
+#  Last modified 2024-08-11 16:04:18
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/0=0%
 
 # Not a target:
-utils/perfectExit.c:
-#  Implicit rule search has been done.
-#  Last modified 2024-07-30 23:30:00
-#  File has been updated.
-#  Successfully updated.
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+includes/superArray.h:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # Not a target:
 .SUFFIXES:
 #  Implicit rule search has not been done.
- 
 #  Modification time never checked.
 #  File has not been updated.
 
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2024-07-30 18:34:06
+#  Last modified 2024-08-11 16:04:18
+ 
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -268,13 +247,10 @@ utils/tokenize_utils.o:
 #  File has not been updated.
 
 # Not a target:
-srcs/ping.c:
-#  Implicit rule search has been done.
-#  Last modified 2024-07-31 00:14:43
-#  File has been updated.
-#  Successfully updated.
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+includes/ping.h:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # Not a target:
 srcs/socket.o:
@@ -282,33 +258,36 @@ srcs/socket.o:
 #  Modification time never checked.
 #  File has not been updated.
 
-utils/superArray.o: utils/superArray.c
-#  Implicit rule search has been done.
-#  Implicit/static pattern stem: `utils/superArray'
-#  Last modified 2024-07-30 23:40:22
-#  File has been updated.
-#  Successfully updated.
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
-#  commands to execute (from `Makefile', line 21):
-	$(CC) $(CFLAGS) -c $< -o $@
-	
+# Not a target:
+utils/superArray.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+srcs/packet_header.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 fclean: clean
 #  Phony target (prerequisite of .PHONY).
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
+#  commands to execute (from `Makefile', line 34):
+	rm -f $(NAME)
+	
 
-ft_ping: main.o srcs/parser.o utils/superArray.o utils/perfectExit.o srcs/ping.o srcs/socket.o utils/tokenize_utils.o
+ft_ping: main.o srcs/parser.o utils/superArray.o utils/perfectExit.o srcs/ping.o srcs/socket.o utils/tokenize_utils.o srcs/packetUtils.o srcs/packet_calc.o utils/init.o srcs/packet_header.o utils/libc.o
 #  Implicit rule search has not been done.
-#  Last modified 2024-07-30 23:40:39
+#  File does not exist.
 #  File has been updated.
 #  Needs to be updated (-q is set).
 # variable set hash-table stats:
 # Load=0/32=0%, Rehash=0, Collisions=0/4=0%
-#  commands to execute (from `Makefile', line 18):
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJ)
+#  commands to execute (from `Makefile', line 25):
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJ) -g -ggdb -lm
 	
 
 # Not a target:
@@ -328,57 +307,100 @@ clean:
 #  Implicit rule search has not been done.
 #  File does not exist.
 #  File has not been updated.
-#  commands to execute (from `Makefile', line 24):
+#  commands to execute (from `Makefile', line 31):
 	rm -f $(OBJ)
 	
 
 # Not a target:
-utils/superArray.c:
-#  Implicit rule search has been done.
-#  Last modified 2024-07-30 18:34:06
-#  File has been updated.
-#  Successfully updated.
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+includes/text_engine.h:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
-srcs/parser.o: srcs/parser.c
-#  Implicit rule search has been done.
-#  Implicit/static pattern stem: `srcs/parser'
-#  Last modified 2024-07-30 23:40:22
-#  File has been updated.
-#  Successfully updated.
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
-#  commands to execute (from `Makefile', line 21):
-	$(CC) $(CFLAGS) -c $< -o $@
-	
+# Not a target:
+includes/init.h:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+srcs/parser.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+includes/libc.h:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 main.o: main.c
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: `main'
-#  Last modified 2024-07-30 23:40:22
+#  File does not exist.
 #  File has been updated.
-#  Successfully updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := main.o
+# automatic
+# % := 
+# automatic
+# * := main
+# automatic
+# + := main.c
+# automatic
+# | := 
+# automatic
+# < := main.c
+# automatic
+# ^ := main.c
+# automatic
+# ? := main.c
 # variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
-#  commands to execute (from `Makefile', line 21):
+# Load=8/32=25%, Rehash=0, Collisions=1/14=7%
+#  commands to execute (from `Makefile', line 28):
 	$(CC) $(CFLAGS) -c $< -o $@
 	
 
-utils/perfectExit.o: utils/perfectExit.c
-#  Implicit rule search has been done.
-#  Implicit/static pattern stem: `utils/perfectExit'
-#  Last modified 2024-07-30 23:40:22
-#  File has been updated.
-#  Successfully updated.
-# variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
-#  commands to execute (from `Makefile', line 21):
-	$(CC) $(CFLAGS) -c $< -o $@
-	
+# Not a target:
+utils/perfectExit.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+utils/init.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+srcs/packet_calc.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+utils/libc.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+srcs/packetUtils.o:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+includes/calc.h:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
 
 # files hash-table stats:
-# Load=21/1024=2%, Rehash=0, Collisions=0/64=0%
+# Load=30/1024=3%, Rehash=0, Collisions=2/74=3%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -390,6 +412,6 @@ utils/perfectExit.o: utils/perfectExit.c
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Mon Aug  5 16:42:52 2024
+# Finished Make data base on Sun Aug 11 16:05:28 2024
 
  
