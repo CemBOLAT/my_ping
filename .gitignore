@@ -3,3 +3,5 @@
 
 *.o
 ft_ping
+
+.DS_Store
