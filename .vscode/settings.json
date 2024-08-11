@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "ping.h": "c",
-        "netdb.h": "c"
-    },
-    "C_Cpp.default.compilerPath": ""
-}
