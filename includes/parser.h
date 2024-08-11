@@ -53,7 +53,7 @@ When you use --ip-timestamp=tsaddr, the IP packets will include a timestamp opti
 #define DEFAULT_DEADLINE -1
 
 
-#define DEFAULT_TIMEOUT 1
+#define DEFAULT_TIMEOUT 10
 #define DEFAULT_TIME_TO_LIVE 64
 
 #define DEFAULT_PACKET_SIZE 56

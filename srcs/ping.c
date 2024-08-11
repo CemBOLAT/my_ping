@@ -81,7 +81,6 @@ void receive_icmp_packet(ft_ping *ping) {
 
 
         uint16_t received_checksum = icmp_hdr->checksum;
-        icmp_hdr->checksum = 0;  // Kontrol için checksum alanını sıfırlayın
         uint16_t calculated_checksum = checksum((uint16_t *)icmp_hdr, bytes_received - ip_header_len);
 
         if (received_checksum != calculated_checksum) {
@@ -148,7 +147,7 @@ void execute_ping(ft_ping *ping){
 
     struct timeval end;
     size_t deadlineValue = ((ping->parametersvalue & TokenType_Deadline) != 0) ? my_atoi(get_option_value(ping->arr, TokenType_Deadline)) : INT_MAX;
-    size_t timeoutValue = ((ping->parametersvalue & TokenType_Timeout) != 0) ? my_atoi(get_option_value(ping->arr, TokenType_Timeout)) : INT_MAX;
+    size_t timeoutValue = ((ping->parametersvalue & TokenType_Timeout) != 0) ? my_atoi(get_option_value(ping->arr, TokenType_Timeout)) : DEFAULT_TIMEOUT;
 
     while (1)
     {
@@ -159,17 +158,18 @@ void execute_ping(ft_ping *ping){
                 signal_exit(SIGINT);
             }
         }
-        if (ping->parametersvalue & TokenType_Timeout){
-            while (1){
-                gettimeofday(&end, NULL);
-                if (end.tv_sec - ping->round_trip.sendTime.tv_sec >= timeoutValue)
+        while (1){
+            gettimeofday(&end, NULL);
+            if (end.tv_sec - ping->round_trip.sendTime.tv_sec >= timeoutValue){
+                if (ping->parametersvalue & TokenType_Timeout){
                     break;
-                if (ping->is_received)
-                    break;
-                receive_icmp_packet(ping);
+                }
+                else{
+                    ft_perfect_exit(ping);
+                }
             }
-        }
-        else {
+            if (ping->is_received)
+                break;
             receive_icmp_packet(ping);
         }
         if (ping->parametersvalue & TokenType_Flood){
