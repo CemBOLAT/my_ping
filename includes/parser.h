@@ -7,10 +7,10 @@ typedef enum s_TokenType {
     TokenType_Help        = 2,    // 1 << 1 -? (done)
     TokenType_Flood       = 4,    // 1 << 2 -f (done)
     TokenType_Preload     = 8,    // 1 << 3 -l (done)
-    TokenType_Numeric     = 16,   // 1 << 4 -n 
+    TokenType_Numeric     = 16,   // 1 << 4 -n
     TokenType_Deadline    = 32,   // 1 << 5 -w
     TokenType_Timeout     = 64,   // 1 << 6 -W
-    TokenType_Pattern     = 128,  // 1 << 7 -p 
+    TokenType_Pattern     = 128,  // 1 << 7 -p
     TokenType_PacketSize  = 256,  // 1 << 8 -s (done)
     TokenType_TOS         = 512,  // 1 << 9 -T
     TokenType_SendPacketType  = 1024, // 1 << 10 -t
@@ -54,7 +54,7 @@ When you use --ip-timestamp=tsaddr, the IP packets will include a timestamp opti
 
 
 #define DEFAULT_TIMEOUT 10
-#define DEFAULT_TIME_TO_LIVE 64
+#define DEFAULT_TIME_TO_LIVE 128
 
 #define DEFAULT_PACKET_SIZE 56
 

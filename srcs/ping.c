@@ -32,7 +32,7 @@ void packetCycle(ft_ping *ping){
     {
         pattern = get_option_value(ping->arr, TokenType_Pattern);
         fill_pattern(ping->packet + sizeof(struct icmp) + sizeof(struct timeval), pattern, ping->packet_size - sizeof(struct icmp) - sizeof(struct timeval));
-    } 
+    }
 
     // Calculate checksum
     icmp_hdr->checksum = checksum((uint16_t *)icmp_hdr, ping->packet_size);
@@ -44,7 +44,7 @@ void packetCycle(ft_ping *ping){
 void send_icmp_packet(ft_ping *ping)
 {
     packetCycle(ping);
-    gettimeofday(&ping->round_trip.sendTime, NULL);    
+    gettimeofday(&ping->round_trip.sendTime, NULL);
     if (sendto(ping->socket, ping->packet, ping->packet_size + sizeof(struct icmphdr), 0, (struct sockaddr *)&ping->dest_addr, sizeof(ping->dest_addr)) <= 0)
     {
         ERROR_MESSAGE("sendto");
@@ -65,7 +65,7 @@ void receive_icmp_packet(ft_ping *ping) {
     int bytes_received = recvfrom(ping->socket, buffer, sizeof(buffer), 0, (struct sockaddr *)&recv_addr, &addr_len);
 
     bool isFlooding = (ping->parametersvalue & TokenType_Flood) != 0;
-    
+
     if (bytes_received < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
             // RED("Request timed out.\n");
@@ -81,6 +81,7 @@ void receive_icmp_packet(ft_ping *ping) {
 
 
         uint16_t received_checksum = icmp_hdr->checksum;
+        icmp_hdr->checksum = 0;
         uint16_t calculated_checksum = checksum((uint16_t *)icmp_hdr, bytes_received - ip_header_len);
 
         if (received_checksum != calculated_checksum) {
@@ -102,13 +103,13 @@ void receive_icmp_packet(ft_ping *ping) {
 
             if (isFlooding == false){
                 printf("%ld bytes from %s: icmp_seq=%lu ttl=%d time=%.3f ms\n",
-                                bytes_received - ip_header_len,
+                                (long int)bytes_received - ip_header_len,
                                 inet_ntoa(recv_addr.sin_addr),
-                                ntohs(icmp_hdr->un.echo.sequence),
+                                (long unsigned int)ntohs(icmp_hdr->un.echo.sequence),
                                 ip_hdr->ttl,
                                 rtt);
             }
-            
+
             update_statistics(ping, rtt);
         } else {
             char output[1024];

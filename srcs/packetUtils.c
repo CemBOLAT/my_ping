@@ -36,8 +36,9 @@ void print_ping_banner(ft_ping *ping)
 {
     int ping_ident = getpid() & 0xFFFF;
 
-    char output[1024];
-    
+    char output[512];
+    char print_output[1024];
+
     sprintf(output, "PING %s (%s)",
            ping->hosts->host[0],
            inet_ntoa(ping->dest_addr.sin_addr)
@@ -58,19 +59,21 @@ void print_ping_banner(ft_ping *ping)
     else if (ping->parametersvalue & TokenType_Verbose)
     {
 
-        sprintf(output, "%s %d data bytes, id 0x%04x = %u",
-                ping->packet_size,
+        sprintf(print_output, "%s %d data bytes, id 0x%04x = %u",
                 output,
+                ping->packet_size,
                 htons(ping_ident),
                 htons(ping_ident));
     }
     else
     {
-        sprintf(output, "%s %d data bytes",
+        sprintf(print_output, "%s %d data bytes",
                 output,
                 ping->packet_size);
     }
-    printf("%s\n", output);
+    printf("%s\n", print_output);
+    my_bzero(print_output, sizeof(print_output));
+    my_bzero(output, sizeof(output));
 }
 
 void preloadOption(ft_ping *ping)

@@ -1,5 +1,6 @@
 
 #include "../includes/ping.h"
+#include <math.h>
 
 // Calculate checksum
 // https://tools.ietf.org/html/rfc1071
@@ -11,7 +12,7 @@ u_short checksum(u_short *buf, int len)
     int     sum = 0;    // 32-bit sum
     u_short temp = 0; // 16-bit temp
 
-    while (nleft > 1) 
+    while (nleft > 1)
     {
         sum += *w++;
         nleft -= 2;
@@ -19,7 +20,7 @@ u_short checksum(u_short *buf, int len)
 
     if (nleft == 1) // one byte left
     {
-        *(u_char *)(&temp) = *(u_char *)w; 
+        *(u_char *)(&temp) = *(u_char *)w;
         sum += temp;
     }
 
@@ -51,7 +52,7 @@ void update_statistics(ft_ping *ping, double rtt)
 
     // Calculate standard deviation
 
-    ping->round_trip.std_dev = my_sqrt(variance);
+    ping->round_trip.std_dev = sqrt(variance);
 
     // Update sum for average and std deviation
     ping->round_trip.sum_rtt += rtt;

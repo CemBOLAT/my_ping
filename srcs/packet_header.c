@@ -41,7 +41,7 @@ void packet_ip_header(ft_ping *ping)
     ip_hdr->tot_len = sizeof(struct iphdr) + sizeof(struct icmphdr) + ping->packet_size;
     ip_hdr->id = htons(getpid()); // ID
     ip_hdr->frag_off = 0; // Fragment offset
-    ip_hdr->ttl = 64; // Time to live
+    ip_hdr->ttl = DEFAULT_TIME_TO_LIVE; // Time to live
     ip_hdr->protocol = IPPROTO_ICMP; // Protocol
     ip_hdr->check = 0; // Checksum
     ip_hdr->saddr = 0; // Source address
@@ -80,8 +80,8 @@ void packet_type(ft_ping *ping, struct icmphdr *icmp_hdr){
         const char *packet_type = get_option_value(ping->arr, TokenType_SendPacketType);
         if (my_strcmp(packet_type, "address") == 0)
         {
-            icmp_hdr->type = ICMP_ADDRESS; 
-        
+            icmp_hdr->type = ICMP_ADDRESS;
+
             uint32_t subnet_mask = htonl(0x00000000); // Replace with the appropriate mask
             my_memcpy(ping->packet + sizeof(struct icmphdr), &subnet_mask, sizeof(subnet_mask));
 
@@ -100,7 +100,7 @@ void packet_type(ft_ping *ping, struct icmphdr *icmp_hdr){
             icmp_hdr->type = ICMP_TIMESTAMP;
             struct timeval tv;
             gettimeofday(&tv, NULL);
-            
+
             uint32_t originate_timestamp = htonl(tv.tv_sec * 1000 + tv.tv_usec / 1000); // Convert to milliseconds
 
             // IP timestamp option
@@ -109,7 +109,7 @@ void packet_type(ft_ping *ping, struct icmphdr *icmp_hdr){
             ip_opts[1] = 10; // length of the option
             ip_opts[2] = 5;  // pointer to the next free byte
             ip_opts[3] = IPOPT_TS_TSONLY;
-            
+
             my_memcpy(&ip_opts[4], &originate_timestamp, sizeof(originate_timestamp));
 
             // Copy IP options into packet after ICMP header

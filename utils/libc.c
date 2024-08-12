@@ -83,13 +83,3 @@ int my_pow(int base, int exp)
         result *= base;
     return result;
 }
-
-int my_sqrt(int x)
-{
-    if (x == 0)
-        return 0;
-    int res = 1;
-    while (res * res <= x)
-        res++;
-    return res - 1;
-}
